@@ -1,1 +1,11 @@
 @import "~bootstrap/scss/bootstrap";
+.tag {
+    background: greenyellow;
+    display: inline-block;
+    height: 20px;
+    margin: 3px;
+    cursor:pointer;
+    i {
+        padding-left: 2px;
+    }
+}
