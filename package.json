@@ -1,0 +1,30 @@
+{
+  "name": "sociogramme",
+  "version": "0.1.0",
+  "description": "IDE tool aiming at the easy creation of a social schematic representation",
+  "main": "index.js",
+  "scripts": {
+    "watch": "webpack --watch",
+    "build": "webpack"
+  },
+  "author": "Glitch Bliss",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^9.4.2",
+    "bootstrap": "^4.1.3",
+    "css-loader": "^2.0.0",
+    "jquery": "^3.3.1",
+    "lokijs": "^1.5.5",
+    "mermaid": "^8.0.0-rc.8",
+    "node-sass": "^4.10.0",
+    "popper": "^1.0.1",
+    "popper.js": "^1.14.6",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.27.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.1.2"
+  }
+}
