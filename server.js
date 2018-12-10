@@ -11,7 +11,7 @@ http.createServer(function (request, response) {
    console.log("Request for " + pathname + " received.");
 
    // Read the requested file content from file system
-   fs.readFile("./scr/"+pathname.substr(1), function (err, data) {
+   fs.readFile("./public/"+pathname.substr(1), function (err, data) {
       if (err) {
          console.log(err);
 

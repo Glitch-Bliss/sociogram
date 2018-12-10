@@ -1,52 +1,74 @@
 
 
 import '../scss/main.scss';
-import mermaidAPI from 'mermaid';
+import { mermaidAPI } from 'mermaid';
 
 /**
  * LOKI JS
  */
 
 const loki = require("lokijs");
-/*
-var db = new loki("quickstart.db");
-var users = db.addCollection("users");
-
-users.insert({ name: 'odin', age: 50 });
-users.insert({ name: 'thor', age: 35 });
-
-var result = users.find({ age: { $lte: 35 } });
-*/
-// dumps array with 1 doc (thor) to console
-//console.log(result);
-
 const db = new loki("sociogram.db");
 const actors = db.addCollection("actors");
 const qualifiers = db.addCollection("qualifiers");
 const relations = db.addCollection("relations");
 
+
+let jsonTest = {
+    "actors": [
+        { "name": "actor1", "tagId": 1 },
+        { "name": "actor2", "tagId": 2 }
+    ],
+    "relations": [
+        { "name": "actor1 aime actor2", "code": "1[acteur1] -->|aime| 2[acteur2]" },
+        { "name": "actor2 déteste actor1", "code": "2[acteur2] -->|aime| 1[acteur1]" },
+    ],
+    "qualifiers": [
+        { "name": "aime", "tagId": 3 },
+        { "name": "déteste", "tagId": 4 }
+    ]
+};
+
+jsonTest.actors.forEach((actor) => {    
+    actors.insert({name: actor.name});
+});
+
+jsonTest.qualifiers.forEach((qualifier) => {    
+    qualifiers.insert({name: qualifier.name});
+});
+
+
 /**
  * MERMAID
  */
 
-var mermaidConfig = {
-    startOnLoad: true,
+const mermaidConfig = {
+    startOnLoad: false,
     htmlLabels: true,
-    callback: function (id) {
-        console.log(id, ' rendered');
-    },
+    callback: function (id) { },
     flowchart: {
         useMaxWidth: true,
-    }
+    },
+    logLevel: 5
 };
-mermaidAPI.initialize(mermaidConfig);
 
-let graphDefinition = 'graph TB\n';
+let randId = 0;
 function renderGraph() {
-    mermaidAPI.render('mermaidGraph', graphDefinition, (svgCode, bindFunctions) => {
-        console.info("Rendering");
-        document.querySelector(".mermaidGraph").innerHTML = svgCode;
+    console.log("Render " + buildGraph());
+    const element = document.querySelector("#graph");
+    //To overcome a bug in api, first parameter has to be different each time, a random string do the job
+    mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
+        element.innerHTML = svgCode;
     });
+}
+
+function buildGraph() {
+    let graphDefinition = 'graph TB\n';
+    const relationsFound = relations.find();
+    for (let i = 0; i < relationsFound.length; i++) {
+        graphDefinition += relationsFound[i].code + '\n';
+    }
+    return graphDefinition;
 }
 
 /**
@@ -55,6 +77,7 @@ function renderGraph() {
 const updateEvent = new Event('update');
 
 document.addEventListener("DOMContentLoaded", () => {
+    mermaidAPI.initialize(mermaidConfig, "graph");
 
     //Pevent forms to try submitting
     document.querySelectorAll("form").forEach((form) => {
@@ -88,8 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const receptorId = document.querySelector("#receptorSelect").value;
         const receptor = document.querySelector("#receptorSelect").options[document.querySelector("#receptorSelect").selectedIndex].text;
 
-        graphDefinition += emettorId + '[' + emettor + '] -->|' + qualifier + '| ' + receptorId + '[' + receptor + ']\n';
-        console.info(graphDefinition);
+        const code = emettorId + '[' + emettor + '] -->|' + qualifier + '| ' + receptorId + '[' + receptor + ']';
+        const name = emettor + ' ' + qualifier + ' ' + receptor;
+        relations.insert({ code: code });
         renderGraph();
         document.dispatchEvent(updateEvent);
     });
@@ -119,7 +143,6 @@ document.addEventListener("update", () => {
      * Qualifiers tags update
      */
     const qualifiersFound = qualifiers.find();
-    console.info("Qualifiers => ", qualifiersFound);
     let qualifiersTag = "";
     let qualifiersOptions = "";
     for (let i = 0; i < qualifiersFound.length; i++) {
