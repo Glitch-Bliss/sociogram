@@ -19,30 +19,12 @@
   <section class="container">
     <section class="row">
       <article class="col-8">
-        <h2>Ajouter une relation</h2>
+        <h2>Relations</h2>
         <form>
-          <div class="input-group mb-1">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="actorsSelect">Emetteur</label>
-            </div>
-            <select class="custom-select" id="actorsSelect">
-            </select>
-          </div>
-          <div class="input-group mb-1">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="qualifiersSelect">Qualificatif</label>
-            </div>
-            <select class="custom-select" id="qualifiersSelect">
-            </select>
-          </div>
-          <div class="input-group mb-1">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="receptorSelect">Récepteur</label>
-            </div>
-            <select class="custom-select" id="receptorSelect">
-            </select>
-          </div>          
-          <button id="button-relation" type="submit" class="btn btn-info">Ajouter</button>
+          <input type="hidden" data-id="" data-name="" name="emettor" id="emettor"/>
+          <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier"/>
+          <input type="hidden" data-id="" data-name="" name="receptor" id="receptor"/>
+          <did id="relationsList"></did>          
         </form>
       </article>
       <aside class="tags col-4">

@@ -16,25 +16,25 @@ const relations = db.addCollection("relations");
 
 let jsonTest = {
     "actors": [
-        { "name": "actor1", "tagId": 1 },
-        { "name": "actor2", "tagId": 2 }
+        { "name": "actor1", "id": "fezfzfzf" },
+        { "name": "actor2", "id": "sfsqfsf" }
     ],
     "relations": [
         { "name": "actor1 aime actor2", "code": "1[acteur1] -->|aime| 2[acteur2]" },
         { "name": "actor2 déteste actor1", "code": "2[acteur2] -->|aime| 1[acteur1]" },
     ],
     "qualifiers": [
-        { "name": "aime", "tagId": 3 },
-        { "name": "déteste", "tagId": 4 }
+        { "name": "aime", "id": "ddzzdd" },
+        { "name": "déteste", "id": "gdsdg" }
     ]
 };
 
-jsonTest.actors.forEach((actor) => {    
-    actors.insert({name: actor.name});
+jsonTest.actors.forEach((actor) => {
+    actors.insert({ name: actor.name, id: actor.id });
 });
 
-jsonTest.qualifiers.forEach((qualifier) => {    
-    qualifiers.insert({name: qualifier.name});
+jsonTest.qualifiers.forEach((qualifier) => {
+    qualifiers.insert({ name: qualifier.name, id: qualifier.id });
 });
 
 
@@ -76,6 +76,19 @@ function buildGraph() {
  */
 const updateEvent = new Event('update');
 
+function addRelation() {
+    const emettorElement = document.querySelector("#emettor");
+    const receptorElement = document.querySelector("#receptor");
+    const qualifierElement = document.querySelector("#qualifier");
+
+    if (emettorElement.dataset.id && receptorElement.dataset.id && qualifierElement.dataset.id) {
+        const code = emettorElement.dataset.id + '[' + emettorElement.dataset.name + '] -->|' + qualifierElement.dataset.name + '| ' + receptorElement.dataset.id + '[' + receptorElement.dataset.name + ']';
+        const name = emettorElement.dataset.name + ' ' + qualifierElement.dataset.name + ' ' + receptorElement.dataset.name;
+        relations.insert({ code: code, name: name });
+        renderGraph();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     mermaidAPI.initialize(mermaidConfig, "graph");
 
@@ -88,7 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#button-actor").addEventListener('click', (event) => {
         const name = document.querySelector("#actorname").value;
         if (name) {
-            actors.insert({ name: name });
+            const id = Math.random().toString(36).substring(3);
+            actors.insert({ name: name, id: id });
         }
         document.dispatchEvent(updateEvent);
     });
@@ -97,77 +111,87 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#button-qualifier").addEventListener('click', (event) => {
         const name = document.querySelector("#qualifiername").value;
         if (name) {
-            qualifiers.insert({ name: name });
+            const id = Math.random().toString(36).substring(3);
+            qualifiers.insert({ name: name, id: id });
         }
-        document.dispatchEvent(updateEvent);
-    });
-
-    // Adds relation
-    document.querySelector('#button-relation').addEventListener('click', (event) => {
-
-        const emettorId = document.querySelector("#actorsSelect").value;
-        const emettor = document.querySelector("#actorsSelect").options[document.querySelector("#actorsSelect").selectedIndex].text;
-        const qualifier = document.querySelector("#qualifiersSelect").options[document.querySelector("#qualifiersSelect").selectedIndex].text;
-        const receptorId = document.querySelector("#receptorSelect").value;
-        const receptor = document.querySelector("#receptorSelect").options[document.querySelector("#receptorSelect").selectedIndex].text;
-
-        const code = emettorId + '[' + emettor + '] -->|' + qualifier + '| ' + receptorId + '[' + receptor + ']';
-        const name = emettor + ' ' + qualifier + ' ' + receptor;
-        relations.insert({ code: code });
-        renderGraph();
         document.dispatchEvent(updateEvent);
     });
 });
 
 document.addEventListener("update", () => {
-
     /**
      * Actors tags update
      */
     const actorsFound = actors.find();
-    let actorsTag = "";
-    let actorsOptions = "";
+    let actorsTag = "";    
     for (let i = 0; i < actorsFound.length; i++) {
-        const id = actorsFound[i].$loki;
+        const id = actorsFound[i].id;
         const name = actorsFound[i].name;
-        const actorTag = '<span class="tag badge" id="' + id + '">' + name + '<i class="far fa-times-circle"></i></span>';
+        const actorTag = '<span class="tag badge" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '<i class="far fa-times-circle actor"></i></span>';
         actorsTag += actorTag;
-        const actorOption = '<option value="' + id + '">' + name + '</option>';
-        actorsOptions += actorOption;
     }
     document.querySelector("#actorsTag").innerHTML = actorsTag;
-    document.querySelector("#actorsSelect").innerHTML = actorsOptions;
-    document.querySelector("#receptorSelect").innerHTML = actorsOptions;
 
     /**
      * Qualifiers tags update
      */
     const qualifiersFound = qualifiers.find();
     let qualifiersTag = "";
-    let qualifiersOptions = "";
     for (let i = 0; i < qualifiersFound.length; i++) {
-        const id = qualifiersFound[i].$loki;
+        const id = qualifiersFound[i].id;
         const name = qualifiersFound[i].name;
-        const actorTag = '<span class="tag badge" id="' + id + '">' + name + '<i class="far fa-times-circle"></i></span>';
+        const actorTag = '<span class="tag badge" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '<i class="far fa-times-circle qualifier"></i></span>';
         qualifiersTag += actorTag;
-        const actorOption = '<option value="' + id + '">' + name + '</option>';
-        qualifiersOptions += actorOption;
     }
-    document.querySelector("#qualifiersTag").innerHTML = qualifiersTag;
-    document.querySelector("#qualifiersSelect").innerHTML = qualifiersOptions;
+    document.querySelector("#qualifiersTag").innerHTML = qualifiersTag;    
 
+    /**
+     * Relations update
+     */
+    const relationsFound = relations.find();
+    let relationsList = "";
+    for (let i = 0; i < relationsFound.length; i++) {        
+        const name = relationsFound[i].name;
+        const code = relationsFound[i].code;
+        const relationItem = '<span class="badge" data-code="' + code + '" data-name="' + name + '" data-type="relation">' + name + '</span>';
+        relationsList += relationItem;
+    }
+    document.querySelector("#relationsList").innerHTML = relationsList;
 
     // Deletes an actor, must be call in update to bind new tags !
     // And MUST be called after tags update
     const tags = document.querySelectorAll(".tag");
     tags.forEach((tag) => {
         tag.addEventListener('click', (event) => {
-            const id = event.currentTarget.id;
-            if (id) {
-                actors.remove({ $loki: id });
+            const element = event.currentTarget;
+
+            if (element.dataset.type == 'actor') {
+                if (event.shiftKey) {
+                    if (element.dataset.id) {
+                        actors.findAndRemove({ id: element.dataset.id });
+                        document.dispatchEvent(updateEvent);
+                    }
+                } else if (event.ctrlKey) {
+                    document.querySelector("#receptor").dataset.id = element.dataset.id;
+                    document.querySelector("#receptor").dataset.name = element.dataset.name;
+                } else {
+                    document.querySelector("#emettor").dataset.id = element.dataset.id;
+                    document.querySelector("#emettor").dataset.name = element.dataset.name;
+                }
             }
+
+            if (element.dataset.type == 'qualifier') {
+                if (event.shiftKey) {
+                    if (element.dataset.id) {
+                        qualifiers.findAndRemove({ id: element.dataset.id });
+                    }
+                }
+                document.querySelector("#qualifier").dataset.id = element.dataset.id;
+                document.querySelector("#qualifier").dataset.name = element.dataset.name;
+            }
+
+            addRelation();
             document.dispatchEvent(updateEvent);
         });
     });
-
 });
