@@ -9,50 +9,61 @@
   <meta name="author" content="Glitch Bliss">
   <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0"
     crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
 <body>
   <script src="bundle.js"></script>
-  <header>
-    header
-  </header>
-  <section class="container">
-    <section class="row">
-      <article class="col-8">
-        <h2>Relations</h2>
-        <form>
-          <input type="hidden" data-id="" data-name="" name="emettor" id="emettor"/>
-          <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier"/>
-          <input type="hidden" data-id="" data-name="" name="receptor" id="receptor"/>
-          <did id="relationsList"></did>          
-        </form>
-      </article>
-      <aside class="tags col-4">
-        <h2>Ajouter un acteur</h2>
-        <form>
-          <div class="input-group mb-3">
+  <header class="container-fluid">
+    <section>
+      <form class="row">
+        <input type="hidden" data-id="" data-name="" name="emettor" id="emettor" />
+        <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier" />
+        <input type="hidden" data-id="" data-name="" name="receptor" id="receptor" />
+        <article class="col-sm-4 col-md-2">
+          <div class="input-group">
             <input id="actorname" type="text" class="form-control" placeholder="Acteur à ajouter" aria-label="Acteur à ajouter"
               aria-describedby="button-addon2">
             <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" id="button-actor">Ajouter</button>
+              <button class="btn btn-outline-secondary" type="button" id="button-actor"><i class="fas fa-plus"></i></button>
             </div>
           </div>
-        </form>
-        <div id="actorsTag">
-        </div>
-        <h2>Ajouter un qualificatif</h2>
-        <form>
-          <div class="input-group mb-3">
+        </article>
+        <article class="col-sm-4 col-md-2">
+          <div class="input-group">
             <input id="qualifiername" type="text" class="form-control" placeholder="Qualificatif à ajouter" aria-label="Qualificatif à ajouter"
               aria-describedby="button-addon2">
             <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" id="button-qualifier">Ajouter</button>
+              <button class="btn btn-outline-secondary" type="button" id="button-qualifier"><i class="fas fa-plus"></i></button>
             </div>
           </div>
-        </form>
-        <div id="qualifiersTag">
-          </div>
-      </aside>
+        </article>
+      </form>
+    </section>
+  </header>
+  <section class="container">
+    <section class="row tagsRow">
+      <article class="col-4">
+        <div class="actorsTag emettor">
+        </div>
+      </article>
+
+      <article class="col-4">
+        <div class="qualifiersTag qualifier">
+        </div>
+      </article>
+
+      <article class="col-4">
+        <div class="actorsTag receptor">
+        </div>
+      </article>
+    </section>
+
+
+    <section class="row">
+      <div class="col-12">
+        <did id="relationsList"></did>
+      </div>
     </section>
     <section class="row">
       <div class="col-12">
@@ -60,10 +71,12 @@
         </div>
       </div>
     </section>
+
   </section>
+
   <footer>
-    footer
   </footer>
+
 </body>
 
 </html>

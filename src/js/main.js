@@ -30,11 +30,15 @@ let jsonTest = {
 };
 
 jsonTest.actors.forEach((actor) => {
-    actors.insert({ name: actor.name, id: actor.id });
+    if (actors.find({ name: actor.name }).length == 0) {
+        actors.insert({ name: actor.name, id: actor.id });
+    }
 });
 
 jsonTest.qualifiers.forEach((qualifier) => {
-    qualifiers.insert({ name: qualifier.name, id: qualifier.id });
+    if (qualifiers.find({ name: qualifier.name }).length == 0) {
+        qualifiers.insert({ name: qualifier.name, id: qualifier.id });
+    }
 });
 
 
@@ -91,6 +95,7 @@ function addRelation() {
 
 document.addEventListener("DOMContentLoaded", () => {
     mermaidAPI.initialize(mermaidConfig, "graph");
+    document.dispatchEvent(updateEvent);
 
     //Pevent forms to try submitting
     document.querySelectorAll("form").forEach((form) => {
@@ -102,7 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = document.querySelector("#actorname").value;
         if (name) {
             const id = Math.random().toString(36).substring(3);
-            actors.insert({ name: name, id: id });
+            if (actors.find({ name: name }).length == 0) {
+                actors.insert({ name: name, id: id });
+            }
         }
         document.dispatchEvent(updateEvent);
     });
@@ -112,25 +119,39 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = document.querySelector("#qualifiername").value;
         if (name) {
             const id = Math.random().toString(36).substring(3);
-            qualifiers.insert({ name: name, id: id });
+            if (qualifiers.find({ name: name }).length == 0) {
+                qualifiers.insert({ name: name, id: id });
+            }
         }
         document.dispatchEvent(updateEvent);
     });
 });
+
+function emptyRelationChunks() {
+    document.querySelector("#emettor").dataset.id = "";
+    document.querySelector("#emettor").dataset.name = "";
+    document.querySelector("#qualifier").dataset.id = "";
+    document.querySelector("#qualifier").dataset.name = "";    
+    document.querySelector("#receptor").dataset.id = "";
+    document.querySelector("#receptor").dataset.name = "";    
+}
 
 document.addEventListener("update", () => {
     /**
      * Actors tags update
      */
     const actorsFound = actors.find();
-    let actorsTag = "";    
+    let actorsTag = "";
     for (let i = 0; i < actorsFound.length; i++) {
         const id = actorsFound[i].id;
         const name = actorsFound[i].name;
-        const actorTag = '<span class="tag badge" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '<i class="far fa-times-circle actor"></i></span>';
+        //const actorTag = '<span class="tag" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '<i class="far fa-times-circle actor"></i></span>';
+        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '</a>';
         actorsTag += actorTag;
     }
-    document.querySelector("#actorsTag").innerHTML = actorsTag;
+    document.querySelectorAll(".actorsTag").forEach((actorTag) => {
+        actorTag.innerHTML = actorsTag;
+    });
 
     /**
      * Qualifiers tags update
@@ -140,17 +161,21 @@ document.addEventListener("update", () => {
     for (let i = 0; i < qualifiersFound.length; i++) {
         const id = qualifiersFound[i].id;
         const name = qualifiersFound[i].name;
-        const actorTag = '<span class="tag badge" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '<i class="far fa-times-circle qualifier"></i></span>';
+        //const actorTag = '<span class="tag" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '<i class="far fa-times-circle qualifier"></i></span>';
+        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '</a>';
         qualifiersTag += actorTag;
     }
-    document.querySelector("#qualifiersTag").innerHTML = qualifiersTag;    
+    document.querySelectorAll(".qualifiersTag").forEach((qualifierTag) => {
+        qualifierTag.innerHTML = qualifiersTag;
+    });
+
 
     /**
      * Relations update
      */
     const relationsFound = relations.find();
     let relationsList = "";
-    for (let i = 0; i < relationsFound.length; i++) {        
+    for (let i = 0; i < relationsFound.length; i++) {
         const name = relationsFound[i].name;
         const code = relationsFound[i].code;
         const relationItem = '<span class="badge" data-code="' + code + '" data-name="' + name + '" data-type="relation">' + name + '</span>';
@@ -165,32 +190,53 @@ document.addEventListener("update", () => {
         tag.addEventListener('click', (event) => {
             const element = event.currentTarget;
 
-            if (element.dataset.type == 'actor') {
-                if (event.shiftKey) {
-                    if (element.dataset.id) {
-                        actors.findAndRemove({ id: element.dataset.id });
-                        document.dispatchEvent(updateEvent);
-                    }
-                } else if (event.ctrlKey) {
-                    document.querySelector("#receptor").dataset.id = element.dataset.id;
-                    document.querySelector("#receptor").dataset.name = element.dataset.name;
-                } else {
-                    document.querySelector("#emettor").dataset.id = element.dataset.id;
-                    document.querySelector("#emettor").dataset.name = element.dataset.name;
-                }
+            if (element.parentNode.classList.contains("emettor")) {                
+                document.querySelector("#emettor").dataset.id = element.dataset.id;
+                document.querySelector("#emettor").dataset.name = element.dataset.name;
+                element.classList.add("selected");
             }
 
-            if (element.dataset.type == 'qualifier') {
-                if (event.shiftKey) {
-                    if (element.dataset.id) {
-                        qualifiers.findAndRemove({ id: element.dataset.id });
-                    }
-                }
+            if (element.parentNode.classList.contains("qualifier")) {                
                 document.querySelector("#qualifier").dataset.id = element.dataset.id;
                 document.querySelector("#qualifier").dataset.name = element.dataset.name;
             }
 
-            addRelation();
+            if (element.parentNode.classList.contains("receptor")) {                
+                document.querySelector("#receptor").dataset.id = element.dataset.id;
+                document.querySelector("#receptor").dataset.name = element.dataset.name;
+
+                addRelation();
+                emptyRelationChunks();
+            }
+
+
+            /*
+                        if (element.dataset.type == 'actor') {
+                            if (event.shiftKey) {
+                                if (element.dataset.id) {
+                                    actors.findAndRemove({ id: element.dataset.id });
+                                    document.dispatchEvent(updateEvent);
+                                }
+                            } else if (event.ctrlKey) {
+                                document.querySelector("#receptor").dataset.id = element.dataset.id;
+                                document.querySelector("#receptor").dataset.name = element.dataset.name;
+                            } else {
+                                document.querySelector("#emettor").dataset.id = element.dataset.id;
+                                document.querySelector("#emettor").dataset.name = element.dataset.name;
+                            }
+                        }
+            
+                        if (element.dataset.type == 'qualifier') {
+                            if (event.shiftKey) {
+                                if (element.dataset.id) {
+                                    qualifiers.findAndRemove({ id: element.dataset.id });
+                                }
+                            }
+                            document.querySelector("#qualifier").dataset.id = element.dataset.id;
+                            document.querySelector("#qualifier").dataset.name = element.dataset.name;
+                        }
+            */
+
             document.dispatchEvent(updateEvent);
         });
     });

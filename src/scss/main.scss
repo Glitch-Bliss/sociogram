@@ -1,10 +1,45 @@
 @import "~bootstrap/scss/bootstrap";
+@import "buttons.scss";
+body {
+    background-color: rgb(54, 54, 54);
+}
+
+header {
+    width: 100%;
+    background: #f7ca18;
+    margin: 0 0 30px;
+    height: 50px;
+    padding: 5px 5px;
+    .input-group input.form-control {
+        background: #363636;
+        width: 100px;
+        color: white;
+    }
+}
+
+#graph {
+    background: white;
+}
+
+.selected::before {
+    top:100%;
+}
+
+.actorsTag,
+.qualifiersTag {
+    width: 100%;
+    text-align: center;
+}
+
 .tag {
-    background: greenyellow;
-    display: inline-block;
-    height: 20px;
-    margin: 3px;
-    cursor:pointer;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    height: 40px;
+    line-height: 40px;
+    padding: 0;
+    width: 33%;
+    text-align: center;
+    cursor: pointer;
     i {
         padding-left: 2px;
     }
