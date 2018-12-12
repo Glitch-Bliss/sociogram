@@ -21,8 +21,11 @@ header {
     background: white;
 }
 
-.selected::before {
-    top:100%;
+.selected {
+    background: red;
+    &::before {
+        top:100%;
+    }
 }
 
 .actorsTag,

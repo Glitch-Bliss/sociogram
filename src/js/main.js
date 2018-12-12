@@ -131,11 +131,20 @@ function emptyRelationChunks() {
     document.querySelector("#emettor").dataset.id = "";
     document.querySelector("#emettor").dataset.name = "";
     document.querySelector("#qualifier").dataset.id = "";
-    document.querySelector("#qualifier").dataset.name = "";    
+    document.querySelector("#qualifier").dataset.name = "";
     document.querySelector("#receptor").dataset.id = "";
-    document.querySelector("#receptor").dataset.name = "";    
+    document.querySelector("#receptor").dataset.name = "";
 }
 
+let idActorSelected = {
+    "emettor": {
+        "list": null, "id": null
+    },
+    "receptor": {
+        "list": null, "id": null
+    }
+};
+let idQualifierSelected = null;
 document.addEventListener("update", () => {
     /**
      * Actors tags update
@@ -145,12 +154,19 @@ document.addEventListener("update", () => {
     for (let i = 0; i < actorsFound.length; i++) {
         const id = actorsFound[i].id;
         const name = actorsFound[i].name;
-        //const actorTag = '<span class="tag" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '<i class="far fa-times-circle actor"></i></span>';
-        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '</a>';
+        const selected = actorsFound[i].selected ? 'selected' : '';
+        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one ' + selected + '" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '</a>';
         actorsTag += actorTag;
     }
-    document.querySelectorAll(".actorsTag").forEach((actorTag) => {
-        actorTag.innerHTML = actorsTag;
+    document.querySelectorAll(".actorsTag").forEach((actorTagList) => {
+        actorTagList.innerHTML = actorsTag;
+        if (actorTagList.classList.contains("emettor")) {
+            actorTagList.querySelectorAll(".tag").forEach((actorTag) => {
+                if (actorTag.dataset.id == idActorSelected.emettor.id) {
+                    actorTag.classList.add("selected");
+                }
+            });
+        }
     });
 
     /**
@@ -161,8 +177,8 @@ document.addEventListener("update", () => {
     for (let i = 0; i < qualifiersFound.length; i++) {
         const id = qualifiersFound[i].id;
         const name = qualifiersFound[i].name;
-        //const actorTag = '<span class="tag" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '<i class="far fa-times-circle qualifier"></i></span>';
-        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '</a>';
+        const selected = idQualifierSelected == id ? 'selected' : '';
+        const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one ' + selected + '" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '</a>';
         qualifiersTag += actorTag;
     }
     document.querySelectorAll(".qualifiersTag").forEach((qualifierTag) => {
@@ -190,53 +206,37 @@ document.addEventListener("update", () => {
         tag.addEventListener('click', (event) => {
             const element = event.currentTarget;
 
-            if (element.parentNode.classList.contains("emettor")) {                
+            if (element.parentNode.classList.contains("emettor")) {
                 document.querySelector("#emettor").dataset.id = element.dataset.id;
                 document.querySelector("#emettor").dataset.name = element.dataset.name;
-                element.classList.add("selected");
+                idActorSelected.emettor.id = element.dataset.id;
+
             }
 
-            if (element.parentNode.classList.contains("qualifier")) {                
+            if (element.parentNode.classList.contains("qualifier")) {
                 document.querySelector("#qualifier").dataset.id = element.dataset.id;
                 document.querySelector("#qualifier").dataset.name = element.dataset.name;
+                idQualifierSelected = element.dataset.id;
             }
 
-            if (element.parentNode.classList.contains("receptor")) {                
+            if (element.parentNode.classList.contains("receptor")) {
                 document.querySelector("#receptor").dataset.id = element.dataset.id;
                 document.querySelector("#receptor").dataset.name = element.dataset.name;
 
+                idActorSelected = {
+                    "emettor": {
+                        "id": null
+                    },
+                    "receptor": {
+                        "id": null
+                    }
+                };
+
+                idQualifierSelected = null; 
+                
                 addRelation();
                 emptyRelationChunks();
             }
-
-
-            /*
-                        if (element.dataset.type == 'actor') {
-                            if (event.shiftKey) {
-                                if (element.dataset.id) {
-                                    actors.findAndRemove({ id: element.dataset.id });
-                                    document.dispatchEvent(updateEvent);
-                                }
-                            } else if (event.ctrlKey) {
-                                document.querySelector("#receptor").dataset.id = element.dataset.id;
-                                document.querySelector("#receptor").dataset.name = element.dataset.name;
-                            } else {
-                                document.querySelector("#emettor").dataset.id = element.dataset.id;
-                                document.querySelector("#emettor").dataset.name = element.dataset.name;
-                            }
-                        }
-            
-                        if (element.dataset.type == 'qualifier') {
-                            if (event.shiftKey) {
-                                if (element.dataset.id) {
-                                    qualifiers.findAndRemove({ id: element.dataset.id });
-                                }
-                            }
-                            document.querySelector("#qualifier").dataset.id = element.dataset.id;
-                            document.querySelector("#qualifier").dataset.name = element.dataset.name;
-                        }
-            */
-
             document.dispatchEvent(updateEvent);
         });
     });
