@@ -20,8 +20,8 @@ let jsonTest = {
         { "name": "actor2", "id": "sfsqfsf" }
     ],
     "relations": [
-        { "name": "actor1 aime actor2", "code": "1[acteur1] -->|aime| 2[acteur2]" },
-        { "name": "actor2 déteste actor1", "code": "2[acteur2] -->|aime| 1[acteur1]" },
+        { "name": "actor1 aime actor2", "code": "1[acteur1] -->|aime| 2[acteur2]", "id": "jklkjh" },
+        { "name": "actor2 déteste actor1", "code": "2[acteur2] -->|aime| 1[acteur1]", "id": "kjhgiguhg" },
     ],
     "qualifiers": [
         { "name": "aime", "id": "ddzzdd" },
@@ -58,12 +58,16 @@ const mermaidConfig = {
 
 let randId = 0;
 function renderGraph() {
-    console.log("Render " + buildGraph());
     const element = document.querySelector("#graph");
-    //To overcome a bug in api, first parameter has to be different each time, a random string do the job
-    mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
-        element.innerHTML = svgCode;
-    });
+    if (relations.find().length > 0) {
+        //To overcome a bug in api, first parameter has to be different each time, a random string do the job
+        mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
+            element.innerHTML = svgCode;
+        });
+    } else {
+        element.innerHTML = '';
+    }
+
 }
 
 function buildGraph() {
@@ -88,8 +92,8 @@ function addRelation() {
     if (emettorElement.dataset.id && receptorElement.dataset.id && qualifierElement.dataset.id) {
         const code = emettorElement.dataset.id + '[' + emettorElement.dataset.name + '] -->|' + qualifierElement.dataset.name + '| ' + receptorElement.dataset.id + '[' + receptorElement.dataset.name + ']';
         const name = emettorElement.dataset.name + ' ' + qualifierElement.dataset.name + ' ' + receptorElement.dataset.name;
-        relations.insert({ code: code, name: name });
-        renderGraph();
+        const id = Math.random().toString(36).substring(3);
+        relations.insert({ code: code, name: name, id: id });
     }
 }
 
@@ -97,13 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mermaidAPI.initialize(mermaidConfig, "graph");
     document.dispatchEvent(updateEvent);
 
-    //Pevent forms to try submitting
-    document.querySelectorAll("form").forEach((form) => {
-        form.addEventListener('submit', (event) => event.preventDefault());
-    });
-
     // Adds an actor
-    document.querySelector("#button-actor").addEventListener('click', (event) => {
+    function addsActor() {
         const name = document.querySelector("#actorname").value;
         if (name) {
             const id = Math.random().toString(36).substring(3);
@@ -112,10 +111,16 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         document.dispatchEvent(updateEvent);
+    }
+    document.querySelector("#button-actor").addEventListener('click', addsActor);
+    document.querySelector("#actorname").addEventListener('keyup', (event) => {
+        if (event.keyCode === 13) {
+            addsActor();
+        }
     });
 
     // Adds qualifier
-    document.querySelector("#button-qualifier").addEventListener('click', (event) => {
+    function addsQualifier() {
         const name = document.querySelector("#qualifiername").value;
         if (name) {
             const id = Math.random().toString(36).substring(3);
@@ -124,6 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         document.dispatchEvent(updateEvent);
+    }
+    document.querySelector("#button-qualifier").addEventListener('click', addsQualifier);
+    document.querySelector("#qualifiername").addEventListener('keyup', (event) => {
+        if (event.keyCode === 13) {
+            addsQualifier();
+        }
     });
 });
 
@@ -167,6 +178,14 @@ document.addEventListener("update", () => {
                 }
             });
         }
+
+        if (actorTagList.classList.contains("receptor")) {
+            actorTagList.querySelectorAll(".tag").forEach((actorTag) => {
+                if (actorTag.dataset.id == idActorSelected.receptor.id) {
+                    actorTag.classList.add("selected");
+                }
+            });
+        }
     });
 
     /**
@@ -185,7 +204,6 @@ document.addEventListener("update", () => {
         qualifierTag.innerHTML = qualifiersTag;
     });
 
-
     /**
      * Relations update
      */
@@ -194,13 +212,22 @@ document.addEventListener("update", () => {
     for (let i = 0; i < relationsFound.length; i++) {
         const name = relationsFound[i].name;
         const code = relationsFound[i].code;
-        const relationItem = '<span class="badge" data-code="' + code + '" data-name="' + name + '" data-type="relation">' + name + '</span>';
+        const id = relationsFound[i].id;
+        const relationItem = '<div class="alert alert-success" role="alert" data-code="' + code + '" data-name="' + name + '" data-type="relation">' + name + '<div class="close" data-id="' + id + '"><i class="fas fa-times"></i></div></div>';
         relationsList += relationItem;
     }
     document.querySelector("#relationsList").innerHTML = relationsList;
 
-    // Deletes an actor, must be call in update to bind new tags !
-    // And MUST be called after tags update
+    // Removes a relation
+    document.querySelectorAll(".close").forEach((closeButton) => {
+        closeButton.addEventListener('click', (event) => {
+            const id = event.currentTarget.dataset.id;
+            relations.findAndRemove({ id: id });
+            document.dispatchEvent(updateEvent);
+        });
+    });
+
+    // Creates a new relation when three buttons clicked
     const tags = document.querySelectorAll(".tag");
     tags.forEach((tag) => {
         tag.addEventListener('click', (event) => {
@@ -223,6 +250,8 @@ document.addEventListener("update", () => {
                 document.querySelector("#receptor").dataset.id = element.dataset.id;
                 document.querySelector("#receptor").dataset.name = element.dataset.name;
 
+                idActorSelected.receptor.id = element.dataset.id;
+
                 idActorSelected = {
                     "emettor": {
                         "id": null
@@ -232,12 +261,14 @@ document.addEventListener("update", () => {
                     }
                 };
 
-                idQualifierSelected = null; 
-                
+                idQualifierSelected = null;
+
                 addRelation();
                 emptyRelationChunks();
             }
             document.dispatchEvent(updateEvent);
         });
     });
+
+    renderGraph();
 });

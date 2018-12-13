@@ -19,6 +19,7 @@ header {
 
 #graph {
     background: white;
+    text-align: center;
 }
 
 .selected {
@@ -34,16 +35,37 @@ header {
     text-align: center;
 }
 
+.tagsRow {
+    margin-bottom: 20px;
+}
+
 .tag {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     color: white;
     height: 40px;
-    line-height: 40px;
+    line-height: 36px;
     padding: 0;
     width: 33%;
     text-align: center;
     cursor: pointer;
     i {
         padding-left: 2px;
+    }
+}
+
+#relationsList {
+    .alert {
+        margin-bottom:5px;
+
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 25px;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            text-align: center;
+        }
     }
 }
