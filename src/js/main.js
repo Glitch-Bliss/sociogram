@@ -2,6 +2,7 @@
 
 import '../scss/main.scss';
 import { mermaidAPI } from 'mermaid';
+import { Base64 } from 'js-base64';
 
 /**
  * LOKI JS
@@ -64,6 +65,8 @@ function renderGraph() {
         mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
             element.innerHTML = svgCode;
         });
+
+        //document.querySelector("#save-image").setAttribute('href', 'data:image/svg+xml;base64,' + Base64.encode(document.querySelector("#graph").innerHTML));
     } else {
         element.innerHTML = '';
     }
@@ -100,6 +103,12 @@ function addRelation() {
 document.addEventListener("DOMContentLoaded", () => {
     mermaidAPI.initialize(mermaidConfig, "graph");
     document.dispatchEvent(updateEvent);
+
+    //Save img
+    document.querySelector("#save-image").addEventListener('click', (event) => {
+        event.target.href = 'data:image/svg+xml;base64,' + Base64.encode(document.querySelector("#graph").innerHTML);
+        event.target.download = 'sociogram.svg';
+    });
 
     // Adds an actor
     function addsActor() {

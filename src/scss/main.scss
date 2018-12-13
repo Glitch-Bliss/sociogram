@@ -22,10 +22,15 @@ header {
     text-align: center;
 }
 
+#save-image {
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+}
+
 .selected {
     background: red;
     &::before {
-        top:100%;
+        top: 100%;
     }
 }
 
@@ -55,8 +60,7 @@ header {
 
 #relationsList {
     .alert {
-        margin-bottom:5px;
-
+        margin-bottom: 5px;
         .close {
             float: right;
             cursor: pointer;
