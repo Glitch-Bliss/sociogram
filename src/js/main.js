@@ -30,17 +30,9 @@ let jsonTest = {
     ]
 };
 
-jsonTest.actors.forEach((actor) => {
-    if (actors.find({ name: actor.name }).length == 0) {
-        actors.insert({ name: actor.name, id: actor.id });
-    }
-});
-
-jsonTest.qualifiers.forEach((qualifier) => {
-    if (qualifiers.find({ name: qualifier.name }).length == 0) {
-        qualifiers.insert({ name: qualifier.name, id: qualifier.id });
-    }
-});
+actors.insert(jsonTest.actors);
+qualifiers.insert(jsonTest.qualifiers);
+relations.insert(jsonTest.relations);
 
 
 /**
@@ -65,8 +57,6 @@ function renderGraph() {
         mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
             element.innerHTML = svgCode;
         });
-
-        //document.querySelector("#save-image").setAttribute('href', 'data:image/svg+xml;base64,' + Base64.encode(document.querySelector("#graph").innerHTML));
     } else {
         element.innerHTML = '';
     }
@@ -107,8 +97,36 @@ document.addEventListener("DOMContentLoaded", () => {
     //Save img
     document.querySelector("#save-image").addEventListener('click', (event) => {
         event.target.href = 'data:image/svg+xml;base64,' + Base64.encode(document.querySelector("#graph").innerHTML);
-        event.target.download = 'sociogram.svg';
+        event.target.download = 'sociogram-graph.svg';
     });
+
+    //Load configuration
+    document.querySelector("#load-configuration").addEventListener('click', (event) => {
+
+    });
+
+    //Save configuration
+    document.querySelector("#save-configuration").addEventListener('click', (event) => {
+        let jsonConfiguration = {
+            "actors": [],
+            "relations": [],
+            "qualifiers": []
+        };
+
+        actors.find().forEach((actor) => {
+            jsonConfiguration.actors.push(actor);
+        });
+        qualifiers.find().forEach((qualifier) => {
+            jsonConfiguration.qualifiers.push(qualifier);
+        });
+        relations.find().forEach((relation) => {
+            jsonConfiguration.relations.push(relation);
+        });
+
+        event.target.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonConfiguration));
+        event.target.download = 'sociogram-configuration.json';
+    });
+
 
     // Adds an actor
     function addsActor() {
