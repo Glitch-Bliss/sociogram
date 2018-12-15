@@ -327,4 +327,5 @@ document.addEventListener("update", () => {
     document.getElementById("graph").classList.toggle("visible", relationsVisibility);
     document.querySelectorAll(".actorTitle").forEach((title) => title.classList.toggle("visible", actorsVisibility));
     document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));
+    document.querySelector(".help").classList.toggle("visible", !qualifierVisibility && !actorsVisibility && !relationsVisibility);
 });

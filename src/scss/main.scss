@@ -17,12 +17,36 @@ header {
     }
 }
 
+footer {
+    font-family: 'Open Sans', sans-serif;
+    position: fixed;
+    bottom: 0;
+    color: white;
+    a {
+        color: white;
+        text-decoration: underline;
+    }
+}
+
 h2 {
     text-align: center;
     color: white;
     font-family: 'Fredericka the Great', cursive;
     font-variant: small-caps;
     display: none;
+    &.visible {
+        display: block;
+    }
+}
+
+.help {
+    display: none;
+    font-family: 'Caveat Brush', cursive;
+    color: white;
+    font-size: 25px;
+    ul {
+        list-style-type: katakana;
+    }
     &.visible {
         display: block;
     }
