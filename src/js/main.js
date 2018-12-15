@@ -3,6 +3,7 @@
 import '../scss/main.scss';
 import { mermaidAPI } from 'mermaid';
 import { Base64 } from 'js-base64';
+import { saveSvgAsPng } from 'save-svg-as-png';
 
 /**
  * LOKI JS
@@ -32,11 +33,14 @@ const mermaidConfig = {
 };
 
 let randId = 0;
+let lastSVGID = "bidon";
 function renderGraph() {
     const element = document.querySelector("#graph");
     if (relations.find().length > 0) {
         //To overcome a bug in api, first parameter has to be different each time, a random string do the job
-        mermaidAPI.render("bidon" + (randId++), buildGraph(), (svgCode, bindFunctions) => {
+        randId++;
+        lastSVGID = "bidon" + randId;
+        mermaidAPI.render(lastSVGID, buildGraph(), (svgCode, bindFunctions) => {
             element.innerHTML = svgCode;
         });
     } else {
@@ -79,8 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Save img
     document.querySelector("#save-image").addEventListener('click', (event) => {
-        event.target.href = 'data:image/svg+xml;base64,' + Base64.encode(document.querySelector("#graph").innerHTML);
-        event.target.download = 'sociogram-graph.svg';
+        event.preventDefault();
+        saveSvgAsPng(document.getElementById(lastSVGID), "sociogram-graph");
     });
 
     //Load configuration
