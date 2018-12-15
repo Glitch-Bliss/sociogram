@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //Save img
     document.querySelector("#save-image").addEventListener('click', (event) => {
         event.preventDefault();
-        saveSvgAsPng(document.getElementById(lastSVGID), "sociogram-graph");
+        saveSvgAsPng(document.getElementById(lastSVGID), "sociogram-graph.png");
     });
 
     //Load configuration
