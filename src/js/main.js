@@ -15,26 +15,6 @@ const qualifiers = db.addCollection("qualifiers");
 const relations = db.addCollection("relations");
 
 
-let jsonTest = {
-    "actors": [
-        { "name": "actor1", "id": "fezfzfzf" },
-        { "name": "actor2", "id": "sfsqfsf" }
-    ],
-    "relations": [
-        { "name": "actor1 aime actor2", "code": "1[acteur1] -->|aime| 2[acteur2]", "id": "jklkjh" },
-        { "name": "actor2 déteste actor1", "code": "2[acteur2] -->|aime| 1[acteur1]", "id": "kjhgiguhg" },
-    ],
-    "qualifiers": [
-        { "name": "aime", "id": "ddzzdd" },
-        { "name": "déteste", "id": "gdsdg" }
-    ]
-};
-
-actors.insert(jsonTest.actors);
-qualifiers.insert(jsonTest.qualifiers);
-relations.insert(jsonTest.relations);
-
-
 /**
  * MERMAID
  */
@@ -77,6 +57,7 @@ function buildGraph() {
  */
 const updateEvent = new Event('update');
 
+
 function addRelation() {
     const emettorElement = document.querySelector("#emettor");
     const receptorElement = document.querySelector("#receptor");
@@ -102,7 +83,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Load configuration
     document.querySelector("#load-configuration").addEventListener('click', (event) => {
-
+        event.preventDefault();
+        document.getElementById("load-configuration-dialog").addEventListener('change', (event) => {
+            const file = event.target.files;
+            if (file[0]) {
+                const reader = new FileReader();
+                reader.addEventListener('load', (event) => {
+                    const jsonConfiguration = JSON.parse(event.target.result);
+                    actors.removeDataOnly();
+                    actors.insert(jsonConfiguration.actors);
+                    qualifiers.removeDataOnly();
+                    qualifiers.insert(jsonConfiguration.qualifiers);
+                    relations.removeDataOnly();
+                    relations.insert(jsonConfiguration.relations);
+                    document.dispatchEvent(updateEvent);
+                });
+                const jsonFile = reader.readAsText(file[0]);
+            }
+        }, false);
+        document.getElementById("load-configuration-dialog").click();
     });
 
     //Save configuration
@@ -114,13 +113,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         actors.find().forEach((actor) => {
-            jsonConfiguration.actors.push(actor);
+            jsonConfiguration.actors.push({ 'name': actor.name, 'id': actor.id });
         });
         qualifiers.find().forEach((qualifier) => {
-            jsonConfiguration.qualifiers.push(qualifier);
+            jsonConfiguration.qualifiers.push({ 'name': qualifier.name, 'id': qualifier.id });
         });
         relations.find().forEach((relation) => {
-            jsonConfiguration.relations.push(relation);
+            jsonConfiguration.relations.push({ 'name': relation.name, 'id': relation.id, 'code': relation.code });
         });
 
         event.target.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonConfiguration));
@@ -143,6 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#actorname").addEventListener('keyup', (event) => {
         if (event.keyCode === 13) {
             addsActor();
+            document.querySelector("#actorname").value = "";
+            document.querySelector("#actorname").focus();
         }
     });
 
@@ -161,6 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#qualifiername").addEventListener('keyup', (event) => {
         if (event.keyCode === 13) {
             addsQualifier();
+            document.querySelector("#qualifiername").value = "";
+            document.querySelector("#qualifiername").focus();
         }
     });
 });
@@ -258,44 +261,66 @@ document.addEventListener("update", () => {
     const tags = document.querySelectorAll(".tag");
     tags.forEach((tag) => {
         tag.addEventListener('click', (event) => {
+            event.preventDefault();
             const element = event.currentTarget;
 
             if (element.parentNode.classList.contains("emettor")) {
-                document.querySelector("#emettor").dataset.id = element.dataset.id;
-                document.querySelector("#emettor").dataset.name = element.dataset.name;
-                idActorSelected.emettor.id = element.dataset.id;
-
+                if (event.ctrlKey) {
+                    actors.findAndRemove({ id: element.dataset.id });
+                } else {
+                    document.querySelector("#emettor").dataset.id = element.dataset.id;
+                    document.querySelector("#emettor").dataset.name = element.dataset.name;
+                    idActorSelected.emettor.id = element.dataset.id;
+                }
             }
 
             if (element.parentNode.classList.contains("qualifier")) {
-                document.querySelector("#qualifier").dataset.id = element.dataset.id;
-                document.querySelector("#qualifier").dataset.name = element.dataset.name;
-                idQualifierSelected = element.dataset.id;
+                if (event.ctrlKey) {
+                    qualifiers.findAndRemove({ id: element.dataset.id });
+                } else {
+                    document.querySelector("#qualifier").dataset.id = element.dataset.id;
+                    document.querySelector("#qualifier").dataset.name = element.dataset.name;
+                    idQualifierSelected = element.dataset.id;
+                }
             }
 
             if (element.parentNode.classList.contains("receptor")) {
-                document.querySelector("#receptor").dataset.id = element.dataset.id;
-                document.querySelector("#receptor").dataset.name = element.dataset.name;
+                if (event.ctrlKey) {
+                    actors.findAndRemove({ id: element.dataset.id });
+                } else {
+                    document.querySelector("#receptor").dataset.id = element.dataset.id;
+                    document.querySelector("#receptor").dataset.name = element.dataset.name;
 
-                idActorSelected.receptor.id = element.dataset.id;
+                    idActorSelected.receptor.id = element.dataset.id;
 
-                idActorSelected = {
-                    "emettor": {
-                        "id": null
-                    },
-                    "receptor": {
-                        "id": null
-                    }
-                };
+                    idActorSelected = {
+                        "emettor": {
+                            "id": null
+                        },
+                        "receptor": {
+                            "id": null
+                        }
+                    };
 
-                idQualifierSelected = null;
+                    idQualifierSelected = null;
 
-                addRelation();
-                emptyRelationChunks();
+                    addRelation();
+                    emptyRelationChunks();
+                }
             }
             document.dispatchEvent(updateEvent);
         });
     });
 
     renderGraph();
+
+    /**
+     * Check download button visibility     
+     */
+
+    if (relations.find().length > 0) {
+        document.getElementById("save-image").classList.add("visible");
+    } else {
+        document.getElementById("save-image").classList.remove("visible");
+    }
 });

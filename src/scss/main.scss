@@ -25,6 +25,15 @@ header {
 #save-image {
     font-family: 'Open Sans', sans-serif;
     color: white;
+    display: none;
+
+    &.visible {
+        display: inline-block;
+    }
+}
+
+#load-configuration-dialog {
+    display: none;
 }
 
 .selected {

@@ -21,10 +21,9 @@
         <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier" />
         <input type="hidden" data-id="" data-name="" name="receptor" id="receptor" />
 
-        <input id="load-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" type="file" name="Charger configuration" />
-        <a id="save-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Télécharger
-          configuration</a>
-        <a id="save-image" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Télécharger sociogramme</a>
+        <input id="load-configuration-dialog" type="file" name="Charger configuration" value="Ouvrir configuration"/>
+        <a id="load-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Ouvrir configuration</a>
+        <a id="save-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Sauver configuration</a>
         <article class="col-sm-4 col-md-2">
           <div class="input-group">
             <input id="actorname" type="text" class="form-control" placeholder="Acteur à ajouter" aria-label="Acteur à ajouter"
@@ -67,6 +66,7 @@
       <div class="col-9 align-content-center">
         <div id="graph">
         </div>
+        <a id="save-image" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Télécharger sociogramme</a>
       </div>
       <div class="col-3">
         <did id="relationsList"></did>
