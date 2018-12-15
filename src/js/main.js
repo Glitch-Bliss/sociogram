@@ -26,7 +26,9 @@ const mermaidConfig = {
     flowchart: {
         useMaxWidth: true,
     },
-    logLevel: 5
+    logLevel: 5,
+    theme: "dark",
+    themeCSS: ".edgeLabel {background-color: #e8e8e8;padding:2px; }"
 };
 
 let randId = 0;
@@ -64,7 +66,7 @@ function addRelation() {
     const qualifierElement = document.querySelector("#qualifier");
 
     if (emettorElement.dataset.id && receptorElement.dataset.id && qualifierElement.dataset.id) {
-        const code = emettorElement.dataset.id + '[' + emettorElement.dataset.name + '] -->|' + qualifierElement.dataset.name + '| ' + receptorElement.dataset.id + '[' + receptorElement.dataset.name + ']';
+        const code = emettorElement.dataset.id + '(' + emettorElement.dataset.name + ') -->|' + qualifierElement.dataset.name + '| ' + receptorElement.dataset.id + '(' + receptorElement.dataset.name + ')';
         const name = emettorElement.dataset.name + ' ' + qualifierElement.dataset.name + ' ' + receptorElement.dataset.name;
         const id = Math.random().toString(36).substring(3);
         relations.insert({ code: code, name: name, id: id });
@@ -318,9 +320,11 @@ document.addEventListener("update", () => {
      * Check download button visibility     
      */
 
-    if (relations.find().length > 0) {
-        document.getElementById("save-image").classList.add("visible");
-    } else {
-        document.getElementById("save-image").classList.remove("visible");
-    }
+    const relationsVisibility = relations.find().length > 0;
+    const actorsVisibility = actors.find().length > 0;
+    const qualifierVisibility = qualifiers.find().length > 0;
+    document.getElementById("save-image").classList.toggle("visible", relationsVisibility);
+    document.getElementById("graph").classList.toggle("visible", relationsVisibility);
+    document.querySelectorAll(".actorTitle").forEach((title) => title.classList.toggle("visible", actorsVisibility));
+    document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));
 });

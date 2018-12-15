@@ -10,6 +10,7 @@
   <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0"
     crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
 </head>
 
 <body>
@@ -21,9 +22,11 @@
         <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier" />
         <input type="hidden" data-id="" data-name="" name="receptor" id="receptor" />
 
-        <input id="load-configuration-dialog" type="file" name="Charger configuration" value="Ouvrir configuration"/>
-        <a id="load-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Ouvrir configuration</a>
-        <a id="save-configuration" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Sauver configuration</a>
+        <input id="load-configuration-dialog" type="file" name="Charger configuration" value="Ouvrir configuration" />
+        <a id="load-configuration" class="col-sm-4 col-md-2 buttonTag animated-button thar-one" href="">Ouvrir
+          configuration</a>
+        <a id="save-configuration" class="col-sm-4 col-md-2 buttonTag animated-button thar-one" href="">Sauver
+          configuration</a>
         <article class="col-sm-4 col-md-2">
           <div class="input-group">
             <input id="actorname" type="text" class="form-control" placeholder="Acteur à ajouter" aria-label="Acteur à ajouter"
@@ -47,28 +50,31 @@
   </header>
   <section class="container">
     <section class="row tagsRow">
-      <article class="col-4">
+      <article class="col-4 align-content-center">
+        <h2 class="actorTitle">Émetteur =></h2>
         <div class="actorsTag emettor">
         </div>
       </article>
 
-      <article class="col-4">
+      <article class="col-4 align-content-center">
+        <h2 class="qualifierTitle">Qualifiant =></h2>
         <div class="qualifiersTag qualifier">
         </div>
       </article>
 
-      <article class="col-4">
+      <article class="col-4 align-content-center">
+        <h2 class="actorTitle">Récepteur</h2>
         <div class="actorsTag receptor">
         </div>
       </article>
     </section>
     <section class="row">
-      <div class="col-9 align-content-center">
+      <div class="col-8 align-content-center text-center">
         <div id="graph">
         </div>
-        <a id="save-image" class="col-sm-4 col-md-2 tag animated-button thar-one" href="">Télécharger sociogramme</a>
+        <a id="save-image" class="buttonTag animated-button thar-one" href="">Télécharger sociogramme</a>
       </div>
-      <div class="col-3">
+      <div class="col-4">
         <did id="relationsList"></did>
       </div>
     </section>
