@@ -1,32 +1,52 @@
 {
-  "name": "sociogramme",
-  "version": "0.1.0",
-  "description": "IDE tool aiming at the easy creation of a social schematic representation",
-  "main": "index.js",
-  "scripts": {
-    "watch": "webpack --watch",
-    "build": "webpack"
-  },
-  "author": "Glitch Bliss",
-  "license": "ISC",
-  "dependencies": {
-    "autoprefixer": "^9.4.2",
-    "bootstrap": "^4.1.3",
-    "css-loader": "^2.0.0",
-    "jquery": "^3.3.1",
-    "js-base64": "^2.4.9",
-    "lokijs": "^1.5.5",
-    "mermaid": "^8.0.0-rc.8",
-    "node-sass": "^4.11.0",
-    "popper": "^1.0.1",
-    "popper.js": "^1.14.6",
-    "postcss-loader": "^3.0.0",
-    "sass-loader": "^7.1.0",
-    "save-svg-as-png": "^1.4.6",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.27.1"
-  },
-  "devDependencies": {
-    "webpack-cli": "^3.1.2"
-  }
+    "name": "sociographer",
+    "author": "Glitch Bliss",
+    "version": "1.0.0",
+    "description": "A tool to create sociograms",
+    "main": "main.js",
+    "repository": "",
+    "scripts": {
+        "start": "sass ./scss:./css && electron .",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder"
+    },
+    "devDependencies": {
+        "electron": "^15.3.0",
+        "electron-builder": "^22.13.1",
+        "electron-log": "^2.2.14",
+        "electron-packager": "^12.1.0",
+        "electron-settings": "^3.0.7",
+        "electron-shortcut-normalizer": "^1.0.0",
+        "electron-winstaller": "^2.2.0"
+    },
+    "dependencies": {
+        "entity-decode": "2.0.2",
+        "eslint": "^7.32.0",
+        "esm": "^3.2.25",
+        "lokijs": "^1.5.12",
+        "mermaid": "^8.9.0",
+        "sass": "^1.43.4",
+        "save-svg-as-png": "^1.4.17",
+        "update-electron-app": "^1.1.1"
+    },
+    "standard": {
+        "env": {
+            "mocha": true
+        }
+    },
+    "build": {
+        "appId": "sociographer",
+        "productName": "Sociographer",
+        "asar": true,
+        "mac": {
+            "category": "TTRPG tool"
+        },
+        "win": {
+            "target": "NSIS"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        }
+    }
 }

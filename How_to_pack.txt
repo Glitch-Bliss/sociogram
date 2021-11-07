@@ -1,0 +1,50 @@
+(npm doesn't work)
+yarn dist
+
+Package.json exemple : 
+
+{
+  "name": "PlayChart",
+  "author": "Glitch Bliss",
+  "version": "1.0.0",
+  "description": "A tool to create a TTRPG chart to agree upon",
+  "main": "main.js",
+  "repository": "",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^7.2.4",
+    "electron-packager": "^12.1.0",
+    "electron-winstaller": "^2.2.0",
+    "electron-builder": "^22.8.0",
+    "electron-log": "^2.2.14",
+    "electron-settings": "^3.0.7",
+    "electron-shortcut-normalizer": "^1.0.0"
+  },
+  "dependencies": {
+    "update-electron-app": "^1.1.1"
+  },
+  "standard": {
+    "env": {
+      "mocha": true
+    }
+  },
+  "build": {
+    "appId": "playchart",
+    "productName": "PlayChart",
+    "asar": true,
+    "mac": {
+      "category": "TTRPG tool"
+    },
+    "win": {
+      "target": "NSIS"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

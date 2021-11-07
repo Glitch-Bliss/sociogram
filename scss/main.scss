@@ -1,4 +1,4 @@
-@import "~bootstrap/scss/bootstrap";
+//@import "~bootstrap/scss/bootstrap";
 @import "buttons.scss";
 body {
     background-color: rgb(54, 54, 54);
@@ -39,31 +39,45 @@ h2 {
     }
 }
 
+div,
+section,
+a,
+button {
+    transition: all 0.5s ease-out;
+}
+
+.visible {
+    opacity: 1 !important;
+    height: auto;
+    width: auto;
+}
+
 .help {
-    display: none;
+    height: 0;
+    opacity: 0;
     font-family: 'Caveat Brush', cursive;
     color: white;
     font-size: 25px;
     ul {
         list-style-type: katakana;
     }
-    &.visible {
-        display: block;
-    }
 }
 
 #graph {
-    text-align: center;    
+    opacity: 0;
+    text-align: center;
+}
+
+#save-configuration {
+    opacity: 0;
 }
 
 #save-image {
     font-family: 'Open Sans', sans-serif;
     color: white;
-    display: none;
+    opacity: 0;    
     margin-left: 0;
     &.visible {
-        display: inline-block;
-        display: inline-block;
         width: 130px;
     }
 }

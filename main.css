@@ -1,0 +1,295 @@
+body {
+    background-color: #2d2d2d;
+    height: 100%;
+    overflow: hidden;
+}
+
+
+/** 
+** MENU
+**
+*/
+
+#formsList {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0;
+}
+
+#formsList button {
+    width: 100%;
+    font-family: 'Mukta', sans-serif;
+    font-size: 1em;
+    background-color: #1b1b1b;
+    color: white;
+    border: solid 0px white;
+    margin: 5px;
+    cursor: pointer;
+    padding: 0;
+    text-align: center;
+    line-height: 30px;
+    padding-left: 5px;
+    position: relative;
+    transition: background-color .2s, color .1s;
+    text-transform: uppercase;
+}
+
+#formsList button:after {
+    content: "";
+    display: block;
+    padding-bottom: 90%;
+}
+
+
+/**
+**   FORM
+**
+*/
+
+#form_chart {
+    height: 100%;
+    width: 70%;
+    position: absolute;
+    top: 0;
+    left: 30%;
+    overflow-y: scroll;
+}
+
+#form_chart input {
+    position: absolute;
+    left: -9999px;
+}
+
+#form_chart label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 7px;
+    width: 100%;
+    padding: 20px;
+    color: #fff;
+    background-color: #5069ab;
+    box-shadow: 1px 1px 1px black;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color .2s, box-shadow .1s;
+    font-family: 'Ubuntu', sans-serif;
+    text-align: center;
+    text-transform: lowercase;
+    font-size: 20px;
+}
+
+#form_chart label:hover,
+input:focus+label {
+    box-shadow: 0 0 10px rgba(0, 0, 0, .6);
+    z-index: 100;
+}
+
+#form_chart input:checked+label {
+    background-color: #772C9A;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.55), 0 10px 10px rgba(0, 0, 0, 0.42);
+}
+
+#form_chart input:checked+label::before {
+    background-color: #fff;
+}
+
+.structure .form_section h2 {
+    padding: 0 10px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    font-family: 'Mukta', sans-serif;
+    font-size: 1.3em;
+    color: #000000d9;
+    margin-bottom: 9px;
+    text-transform: uppercase;
+}
+
+.structure .form_section {
+    display: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.structure .form_section.active {
+    display: block;
+}
+
+.structure .form_section .answers {
+    display: grid;
+    grid-template-columns: 33% 33% 34%;
+}
+
+@media (max-width: 1024px) {
+    .structure .form_section .answers {
+        grid-template-columns: 50% 50%;
+    }
+}
+
+.structure .form_section .answer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.structure .form_section .answer:after {
+    content: "";
+    display: block;
+    padding-bottom: 90%;
+}
+
+
+/**
+**   MENU
+**
+*/
+
+.structure menu {
+    margin: 0;
+    padding: 0;
+    width: 30%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: bottom;
+    justify-content: center;
+}
+
+.structure menu button {
+    user-select: none;
+    order: 0;
+    width: 100%;
+    font-family: 'Mukta', sans-serif;
+    font-size: 1em;
+    background-color: #2d2d2d;
+    color: white;
+    border: solid 0px white;
+    margin: 0px;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    line-height: 30px;
+    padding-left: 5px;
+    position: relative;
+    transition: background-color .2s, color .1s;
+}
+
+.structure menu button.menu_button {
+    counter-increment: section;
+}
+
+.structure menu button:nth-of-type(odd) {
+    background-color: #3b3b3b;
+}
+
+.structure menu button.selected {
+    background: #ccae14;
+    color: #3b3b3b;
+    text-shadow: none;
+    border: none;
+}
+
+.structure menu button.selected:focus {
+    outline-width: 0;
+}
+
+.structure menu button:hover {
+    color: #3b3b3b;
+    text-shadow: none;
+}
+
+.structure menu button span {
+    z-index: 100;
+    display: inline-block;
+    position: relative;
+}
+
+.structure menu button span::before {
+    content: "#" counter(section)" ";
+    color: #ccae14;
+}
+
+.structure menu button::before {
+    transition: all .15s ease-Out;
+    width: 7px;
+    background: #ccae14;
+    height: 100%;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.structure menu button:visited {
+    border: none;
+}
+
+.structure menu button:hover::before {
+    width: 100%;
+}
+
+
+/**
+**  RENDER BUTTON  
+**/
+
+#tools {
+    display: grid;
+    grid-template-columns: 50px 50px auto;
+    order: 1;
+    width: 100%;
+}
+
+#back {
+    display: flex;
+    align-items: stretch;
+    /* height: 100%; */
+    align-content: center;
+    width: 100%;
+}
+
+#tools button,
+#back button {
+    line-height: 30px;
+    color: #3b3b3b;
+    background: #ffffff;
+    text-transform: uppercase;
+    border-top: solid 3px black;
+    transition: all .20s ease-Out;
+}
+
+#tools .tool-icon {
+    text-align: center;
+}
+
+#tools button i,
+#back button i {
+    font-size: 30px;
+    margin-right: 10px;
+    color: #3b3b3b;
+    transition: all .20s ease-Out;
+}
+
+#tools button::before,
+#tools button:hover::before,
+#back button::before,
+#back button:hover::before {
+    background: none;
+}
+
+#tools button:hover,
+#tools button:hover i,
+#back button:hover,
+#back button:hover i {
+    color: #ccae14;
+}
