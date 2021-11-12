@@ -1,128 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { electron, ipcRenderer } = require('electron');
-const { dialog } = require('electron');
-const { serialize, deserialize } = require('v8');
-const console = require("console");
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-
-    let mx = require("mxgraph")({
-        mxImageBasePath: "./mxgraph_sources/images",
-        mxBasePath: "./mxgraph_sources"
-    })
-
-    let container = document.getElementById("graphContainer");
-    // Creates the graph inside the given container
-    let graph = new mx.mxGraph(container);
-
-    // Enables rubberband selection
-    // new mx.mxRubberband(graph);
-
-    // Gets the default parent for inserting new cells. This
-    // is normally the first child of the root (ie. layer 0).
-    let parent = graph.getDefaultParent();
-
-    // Adds cells to the model in a single step
-    graph.getModel().beginUpdate();
-    // Enables wrapping for vertex labels
-    graph.isWrapping = function (cell) {
-        return cell.vertex;
-    };
-
-    // Disable cells selection and egdes move
-    graph.setEnabled(false);
-    graph.setTooltips(true);
-    graph.htmlLabels = true;
-    // Autosize labels on insert where autosize=1
-    graph.autoSizeCellsOnAdd = true;
-
-    // Sets global styles
-    let style = graph.getStylesheet().getDefaultEdgeStyle();
-    style[mx.mxConstants.STYLE_EDGE] = mx.mxEdgeStyle.ElbowConnector;
-    style[mx.mxConstants.STYLE_ROUNDED] = true;
-
-    // Resizes the container
-    graph.setResizeContainer(true);
-
-    try {
-        let v1 = graph.insertVertex(parent, null,
-            'Hello, a very long text it is ! Wow, so long ! Do you adapt your size ?', 20, 20, 80, 120);
-        let v2 = graph.insertVertex(parent, null,
-            'World!', 200, 150, 80, 30);
-        let v3 = graph.insertVertex(parent, null,
-            'toutout loutoutou', 20, 20, 80, 30);
-        let v4 = graph.insertVertex(parent, null,
-            'whattabuttit', 200, 150, 80, 30);
-        let v5 = graph.insertVertex(parent, null,
-            'pripipipi lala loulou', 20, 20, 80, 30);
-        let v6 = graph.insertVertex(parent, null,
-            'getup standup', 200, 150, 80, 30);
-        let v7 = graph.insertVertex(parent, null,
-            'chamou lhaya', 20, 20, 80, 30);
-        let v8 = graph.insertVertex(parent, null,
-            'patapontatra', 200, 150, 80, 30);
-        let e1 = graph.insertEdge(parent, null, 'Oh ! Un text !', v1, v2, 'verticalAlign=bottom');
-        let e2 = graph.insertEdge(parent, null, '', v2, v3);
-        let e3 = graph.insertEdge(parent, null, '', v3, v4);
-        let e4 = graph.insertEdge(parent, null, '', v6, v7);
-        let e5 = graph.insertEdge(parent, null, '', v4, v5);
-        let e7 = graph.insertEdge(parent, null, '', v8, v6);
-
-    }
-    finally {
-        // Updates the display
-        graph.getModel().endUpdate();
-
-        const layout = new mx.mxHierarchicalLayout(graph);
-        const orientation = mx.mxConstants.DIRECTION_WEST || mx.mxConstants.DIRECTION_NORTH;
-        layout.orientation = mx.mxConstants.DIRECTION_WEST;
-        layout.execute(parent);
-    }
-
-    document.querySelector("#mxCircleLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxCircleLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxCompactTreeLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxCompactTreeLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxCompositeLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxCompositeLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxFastOrganicLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxFastOrganicLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxParallelEdgeLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxParallelEdgeLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxPartitionLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxPartitionLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxStackLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxStackLayout(graph);
-        layout.execute(parent);
-    });
-    document.querySelector("#mxHierarchicalLayout").addEventListener('click', (event) => {
-        const layout = new mx.mxHierarchicalLayout(graph);
-        layout.execute(parent);
-    });
-
-});
-
+// const fs = require('fs');
+// const path = require('path');
+// const os = require('os');
+// const { electron, ipcRenderer } = require('electron');
+// const { dialog } = require('electron');
+// const { serialize, deserialize } = require('v8');
+// const console = require("console");
 
 /**
  * Classes
  */
-// const mermaidJs = require("./mermaidjs.class.js");
+// const mermaidJs = require("./mermaidjs.class.mjs");
+import mermaidJs from ("./mermaidjs.class.mjs")
 // const lokiDb = require("./lokiDb.class");
 // const Utils = require("./utils.class");
 
@@ -440,5 +328,4 @@ document.addEventListener("DOMContentLoaded", () => {
 //     document.getElementById("save-configuration").classList.toggle("visible", actorsVisibility);
 //     document.querySelectorAll(".actorTitle").forEach((title) => title.classList.toggle("visible", actorsVisibility));
 //     document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));
-//     document.querySelector(".help").classList.toggle("visible", !qualifierVisibility && !actorsVisibility && !relationsVisibility);
-// });
+//     document.querySelector(".help").classList.toggle("visible", !

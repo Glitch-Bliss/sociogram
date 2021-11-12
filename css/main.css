@@ -490,8 +490,6 @@ button {
 }
 
 .help {
-  height: 0;
-  opacity: 0;
   font-family: "Caveat Brush", cursive;
   color: white;
   font-size: 25px;
