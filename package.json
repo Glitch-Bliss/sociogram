@@ -20,6 +20,7 @@
         "electron-winstaller": "^2.2.0"
     },
     "dependencies": {
+        "electron-alert": "^0.1.19",
         "entity-decode": "2.0.2",
         "eslint": "^7.32.0",
         "esm": "^3.2.25",

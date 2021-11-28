@@ -476,13 +476,6 @@ h2.visible {
   display: block;
 }
 
-div,
-section,
-a,
-button {
-  transition: all 0.5s ease-out;
-}
-
 .visible {
   opacity: 1 !important;
   height: auto;
@@ -571,6 +564,18 @@ button {
   background-color: #bdd5ea;
   border-color: #9e6ab5;
   border-radius: 0;
+}
+
+.hide {
+  display: none;
+}
+
+.graphContainer {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: white;
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=main.css.map */

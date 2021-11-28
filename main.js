@@ -1,7 +1,9 @@
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
+//https://electron.guide/electron-alert/
+const Alert = require("electron-alert");
 
 function createWindow() {
 
@@ -20,14 +22,47 @@ function createWindow() {
         }
     })
     mainWindow.loadFile('index.html');
-
 }
+
+ipcMain.handle('alert:message', async (_, args) => {
+    let alert = new Alert();
+    let swalOptions = {
+        position: "center",
+        title: args.message,
+        icon: args.icon,
+        showConfirmButton: true,
+        timer: 10000,
+        timerProgressBar: true
+    };
+    Alert.fireToast(swalOptions);
+});
+
+ipcMain.handle('dialog:open', async (_, args) => {
+    return await dialog.showOpenDialog({
+        buttonLabel: 'Ouvrir',
+        filters: [{ name: 'Fichiers Sociographers', extensions: ['sociographer'] }],
+        property: ['openFile']
+    });
+});
+
+ipcMain.handle('dialog:message', async (_, args) => {
+    dialog.showMessageBox(args, (index) => { });
+});
+
+ipcMain.handle('dialog:save', async (_, args) => {
+    return await dialog.showSaveDialog({
+        buttonLabel: 'Sauvegarder',
+        filters: [{ name: 'Fichier Sociographer', extensions: ['sociographer'] }],
+        property: ['createDirectory', 'showOverwriteConfirmation']
+    });
+});
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-    createWindow()
+    createWindow();
 
     app.on('activate', function () {
         // On macOS it's common to re-create a window in the app when the
