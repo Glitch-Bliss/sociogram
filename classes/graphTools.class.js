@@ -1,5 +1,3 @@
-
-
 // https://github.com/jgraph/mxgraph-js/tree/master/javascript/examples
 class GraphTools {
 
@@ -134,43 +132,6 @@ class GraphTools {
         }
     }
 
-    generateTestGraph() {
-        try {
-            this.graph.getModel().beginUpdate();
-            let v1 = this.graph.insertVertex(this.parent, null,
-                'Hello, a very long text it is ! Wow, so long ! Do you adapt your size ?', 20, 20, 80, 120);
-            let v2 = this.graph.insertVertex(this.parent, null,
-                'World!', 200, 150, 80, 30);
-            let v3 = this.graph.insertVertex(this.parent, null,
-                'toutout loutoutou', 20, 20, 80, 30);
-            let v4 = this.graph.insertVertex(this.parent, null,
-                'whattabuttit', 200, 150, 80, 30);
-            let v5 = this.graph.insertVertex(this.parent, null,
-                'pripipipi lala loulou', 20, 20, 80, 30);
-            let v6 = this.graph.insertVertex(this.parent, null,
-                'getup standup', 200, 150, 80, 30);
-            let v7 = this.graph.insertVertex(this.parent, null,
-                'chamou lhaya', 20, 20, 80, 30);
-            let v8 = this.graph.insertVertex(this.parent, null,
-                'patapontatra', 200, 150, 80, 30);
-            let e1 = this.graph.insertEdge(this.parent, null, 'Oh ! Un text !', v1, v2, 'verticalAlign=bottom');
-            let e2 = this.graph.insertEdge(this.parent, null, '', v2, v3);
-            let e3 = this.graph.insertEdge(this.parent, null, '', v3, v4);
-            let e4 = this.graph.insertEdge(this.parent, null, '', v6, v7);
-            let e5 = this.graph.insertEdge(this.parent, null, '', v4, v5);
-            let e7 = this.graph.insertEdge(this.parent, null, '', v8, v6);
-        }
-        finally {
-            // Updates the display
-            this.graph.getModel().endUpdate();
-
-            const layout = new this.mx.mxHierarchicalLayout(this.graph);
-            const orientation = this.mx.mxConstants.DIRECTION_WEST || this.mx.mxConstants.DIRECTION_NORTH;
-            layout.orientation = this.mx.mxConstants.DIRECTION_WEST;
-            layout.execute(this.parent);
-        }
-    }
-
     addMouseListeners() {
         this.container.addEventListener('mouseover', () => {
             this.container.dataset.mouseover = true;
@@ -182,7 +143,7 @@ class GraphTools {
 
         window.addEventListener('wheel', (event) => {
             if (this.container.dataset.mouseover == "true") {
-                if (event.deltaY > 0) {
+                if (event.deltaY < 0) {
                     this.graph.zoomIn();
                 } else {
                     this.graph.zoomOut();
