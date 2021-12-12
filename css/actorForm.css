@@ -1,0 +1,40 @@
+.cellForm {
+  display: none;
+}
+.cellForm.open {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
+  height: 100%;
+  flex-direction: row;
+  justify-content: flex-end;
+  background: white;
+  padding: 10px;
+  width: 300px;
+}
+.cellForm .cell {
+  width: 100%;
+}
+.cellForm .imageDrop {
+  width: 100%;
+  background-color: #1caff6;
+  margin-top: 30px;
+  border-radius: 10px;
+  border: dashed 2px white;
+  color: white;
+  text-align: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  font-size: 14pt;
+  transition: 0.5s background-color, 0.5s color;
+  height: 100px;
+  font-family: inherit;
+}
+.cellForm .nodeImage {
+  width: 100%;
+  display: block;
+}
+
+/*# sourceMappingURL=actorForm.css.map */

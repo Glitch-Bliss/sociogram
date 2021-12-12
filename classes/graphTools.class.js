@@ -1,4 +1,9 @@
+
+
+const GlobalService = require("./global.service.class");
+
 // https://github.com/jgraph/mxgraph-js/tree/master/javascript/examples
+// https://jgraph.github.io/mxgraph/docs/js-api/files/model/mxCell-js.html
 class GraphTools {
 
     graph;
@@ -64,13 +69,26 @@ class GraphTools {
         this.graph.setResizeContainer(false);
 
         // Adding cell click listener
-        this.graph.addListener(this.mx.mxEvent.CLICK, function (sender, evt) {
+        // Fill edit form
+        this.graph.addListener(this.mx.mxEvent.CLICK, (sender, evt) => {
             let cell = evt.getProperty('cell');
-            console.info("sender", sender);
-            console.info("event", evt);
-            console.info(cell);
+            this.initCellForm(cell);
         });
 
+    }
+
+
+    /**
+     * Emit a dom event when the cell is clicked, providing cell value (= xml form of the created doc)
+     * @param {*} cell 
+     */
+    initCellForm(cell) {
+        if (cell.value) {
+            const cellEvent = new CustomEvent("cellClick", {
+                detail: cell.value
+            });
+            document.dispatchEvent(cellEvent);
+        }
     }
 
     /**
@@ -85,9 +103,14 @@ class GraphTools {
 
         for (let attribute in object) {
             try {
-                document.setAttribute(attribute, object[attribute]);
+                if (typeof object[attribute] == 'object') {
+                    object[attribute] = JSON.stringify(object[attribute]);
+                }
+                const name = attribute.replace(/[^a-zA-Z0-9]/g, '');
+                document.setAttribute(name, object[attribute]);
             } catch (error) {
                 console.warn(`An error occured when filling graph document for attribute ${attribute}`);
+                console.error("error ", error);
             }
         }
         return document;

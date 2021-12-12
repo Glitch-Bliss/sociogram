@@ -1,0 +1,27 @@
+{
+    "name": "sociographer",
+    "author": "Glitch Bliss",
+    "version": "1.0.0",
+    "description": "A tool to create sociograms",
+    "main": "main.js",
+    "repository": "",
+    "scripts": {
+        "start": "sass ./scss:./css && electron .",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder"
+    },
+    "devDependencies": {
+        "electron": "^15.3.0",
+        "electron-builder": "^22.13.1",
+        "electron-log": "^2.2.14",
+        "electron-packager": "^12.1.0",
+        "electron-settings": "^3.0.7",
+        "electron-shortcut-normalizer": "^1.0.0",
+        "electron-winstaller": "^2.2.0"
+    },
+    "dependencies": {
+        "electron-alert": "^0.1.19",
+        "entity-decode": "2.0.2",
+        "eslint": "^7.32.0",
+        "esm": "^3.2.25",
+   

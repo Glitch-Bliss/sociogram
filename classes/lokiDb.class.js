@@ -1,6 +1,8 @@
 
 const loki = require("lokijs");
+const GlobalService = require("./global.service.class");
 
+//https://rawgit.com/techfort/LokiJS/master/examples/sandbox/LokiSandbox.htm
 class LokiDb {
 
     db;
@@ -67,7 +69,8 @@ class LokiDb {
     addNode(name, type) {
         const id = type + Math.random().toString(36).substring(3);
         if (this.nodes.find({ name: name }).length == 0) {
-            this.nodes.insert({ name: name, id: id, type: type });
+            const node = this.nodes.insert({ name: name, id: id, type: type });
+            
         }
     }
 

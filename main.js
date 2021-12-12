@@ -11,12 +11,13 @@ function createWindow() {
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
+        width: 1500,
+        height: 1200,
         show: true,
         icon: image,
         autoHideMenuBar: true,
         webPreferences: {
+            devTools: true,
             enableRemoteModule: true,
             preload: path.join(__dirname, 'preload_main.js'),
         }

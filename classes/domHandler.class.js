@@ -8,9 +8,7 @@ const { serialize, deserialize } = require('v8');
 /**
  * Classes
  */
-const lokiDb = require("./lokiDb.class");
-const Utils = require("./utils.class");
-const GraphTools = require("./graphTools.class");
+const GlobalService = require("./global.service.class");
 
 class DomHandler {
 
@@ -33,11 +31,19 @@ class DomHandler {
     }
 
     /**
+     * Init the form for cell editing
+     * Toggles visibility
+     */
+    setCellsForm() {
+
+    }
+
+    /**
      * When adding new actor
      */
     addActor() {
         const name = document.querySelector("#actorname").value;
-        lokiDb.addActor(name);
+        GlobalService.lokiDb.addActor(name);
         this.updateDomEvent();
     }
 
@@ -66,7 +72,7 @@ class DomHandler {
      */
     addQualifier() {
         const qualifier = document.querySelector("#qualifiername").value;
-        lokiDb.addQualifier(qualifier);
+        GlobalService.lokiDb.addQualifier(qualifier);
         this.updateDomEvent();
     }
 
@@ -91,6 +97,96 @@ class DomHandler {
     }
 
     /**
+     * Triggers when a graph cell is clicked
+     */
+    addCellClickListener() {
+        document.addEventListener("cellClick", (event) => {
+            const formWindow = document.querySelector(".cellForm");
+            formWindow.classList.add("open");
+
+            const id = event.detail.getAttribute("id");
+            const node = GlobalService.lokiDb.nodes.find({ id: id });
+
+            const form = document.querySelector(".cellDetails");
+            for (let attribute in node[0]) {
+                if (form[attribute]) {
+                    form[attribute].value = node[0][attribute];
+                }
+            }
+
+        })
+    }
+
+    addActorFormListener() {
+        const imageDrop = document.querySelector(".imageDrop");
+        const form = document.querySelector(".cellDetails");
+
+        /**
+         * Handles close button behavior
+         */
+        const formWindow = document.querySelector(".cellForm");
+        document.querySelector(".formClose").addEventListener("click", () => {
+            formWindow.classList.remove("open");
+        });
+
+        /**
+         * Handles image drags behavior
+         * Used for style behavior
+         */
+        ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave'].forEach((eventName) => {
+            imageDrop.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.info("Event ? ", event);
+            });
+        });
+
+        /**
+         * Handles image drop
+         * Used to convert image to a base64 code usable in cell style later
+         */
+        imageDrop.addEventListener("drop", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            let items = event.dataTransfer.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    //image
+                    let blob = items[i].getAsFile();
+
+                    let fileReader = new FileReader();
+                    fileReader.onloadend = () => {
+                        //The image is a base64 image now !!!
+                        const base64Image = fileReader.result;
+                        const image = document.querySelector(".nodeImage");
+                        image.src = base64Image;
+                        form.imageDataURL.value = base64Image;
+                    }
+                    fileReader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        /**
+         * We update current node
+         */
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            console.info(" Form => ", form);
+            console.info("Submitted");
+
+            const node = GlobalService.lokiDb.nodes.findOne({ id: form.id.value });
+            console.info("found node ", node);
+            node.name = form.name.value;
+            node.details = form.details.value;
+            node.imageDataURL = form.imageDataURL.value;
+            GlobalService.lokiDb.nodes.update(node);
+        })
+    }
+
+    /**
      * Add listener and behavior for load button
      */
     loadConfigurationListener() {
@@ -102,10 +198,12 @@ class DomHandler {
                     let openedFile = fs.readFileSync(result.filePaths[0]);
                     let jsonConfiguration = JSON.parse(openedFile);
 
-                    lokiDb.nodes.removeDataOnly();
-                    lokiDb.nodes.insert(jsonConfiguration.nodes);
-                    lokiDb.relations.removeDataOnly();
-                    lokiDb.relations.insert(jsonConfiguration.relations);
+                    // GlobalService.lokiDb.nodes.removeDataOnly();
+                    GlobalService.lokiDb.nodes.insert(jsonConfiguration.nodes);
+                    // GlobalService.lokiDb.relations.removeDataOnly();
+                    GlobalService.lokiDb.relations.insert(jsonConfiguration.relations);
+
+                    console.info("GlobalService.lokiDb.nodes ", GlobalService.lokiDb.nodes);
                     this.updateDomEvent();
                     this.renderGraph();
                 } catch (error) {
@@ -127,7 +225,7 @@ class DomHandler {
     saveImageListener() {
         document.querySelector("#save-image").addEventListener('click', (event) => {
             event.preventDefault();
-            Utils.saveGraphToImage();
+            GlobalService.Utils.saveGraphToImage();
         });
     }
 
@@ -141,10 +239,10 @@ class DomHandler {
                 "relations": []
             };
 
-            lokiDb.nodes.find().forEach((node) => {
+            GlobalService.lokiDb.nodes.find().forEach((node) => {
                 jsonConfiguration.nodes.push({ 'name': node.name, 'id': node.id, 'type': node.type });
             });
-            lokiDb.getRelations().forEach((relation) => {
+            GlobalService.lokiDb.getRelations().forEach((relation) => {
                 jsonConfiguration.relations.push({ 'from': relation.from, 'by': relation.by, 'to': relation.to, 'id': relation.id });
             });
 
@@ -186,17 +284,18 @@ class DomHandler {
     renderGraph = () => {
 
         // Graph rendering    
-        GraphTools.init();
-        GraphTools.addLayoutButtons();
-        GraphTools.addMouseListeners();
+        GlobalService.GraphTools.init();
+        GlobalService.GraphTools.addLayoutButtons();
+        GlobalService.GraphTools.addMouseListeners();
 
-        lokiDb.getRelations()?.forEach(
+        GlobalService.lokiDb.getRelations()?.forEach(
             (relation) => {
-                const actor1 = lokiDb.nodes.find({ id: relation.from });
-                const actor2 = lokiDb.nodes.find({ id: relation.to });
-                const qualifier = lokiDb.nodes.find({ id: relation.by });
-                if (actor1[0] && qualifier[0] && actor2[0]) {
-                    GraphTools.addRelationship(actor1[0], qualifier[0], actor2[0]);
+                // We exclude lokidb internal vars and we must use var instead of let to redeclare meta and $loki
+                var { meta, $loki, ...actor1 } = GlobalService.lokiDb.nodes.findOne({ id: relation.from });
+                var { meta, $loki, ...actor2 } = GlobalService.lokiDb.nodes.findOne({ id: relation.to });
+                var { meta, $loki, ...qualifier } = GlobalService.lokiDb.nodes.findOne({ id: relation.by });
+                if (actor1 && qualifier && actor2) {
+                    GlobalService.GraphTools.addRelationship(actor1, qualifier, actor2);
                 } else {
                     console.error('An element is missing from relation', relation);
                 }
@@ -212,7 +311,7 @@ class DomHandler {
         /**
          * Actors tags update
          */
-        const actorsFound = lokiDb.getActors();
+        const actorsFound = GlobalService.lokiDb.getActors();
         let actorsTag = "";
         for (let i = 0; i < actorsFound.length; i++) {
             const id = actorsFound[i].id;
@@ -243,7 +342,7 @@ class DomHandler {
         /**
          * Qualifiers tags update
          */
-        const qualifiersFound = lokiDb.getQualifiers();
+        const qualifiersFound = GlobalService.lokiDb.getQualifiers();
         let qualifiersTag = "";
         for (let i = 0; i < qualifiersFound.length; i++) {
             const id = qualifiersFound[i].id;
@@ -259,14 +358,13 @@ class DomHandler {
         /**
          * Relations update
          */
-        const relationsFound = lokiDb.getRelations();
+        const relationsFound = GlobalService.lokiDb.getRelations();
         let relationsList = "";
-        lokiDb.getRelations()?.forEach(
+        GlobalService.lokiDb.getRelations()?.forEach(
             (relation) => {
-                console.info("Relation ", relation.$loki)
-                const actor1 = lokiDb.nodes.find({ id: relation.from });
-                const actor2 = lokiDb.nodes.find({ id: relation.to });
-                const qualifier = lokiDb.nodes.find({ id: relation.by });
+                const actor1 = GlobalService.lokiDb.nodes.find({ id: relation.from });
+                const actor2 = GlobalService.lokiDb.nodes.find({ id: relation.to });
+                const qualifier = GlobalService.lokiDb.nodes.find({ id: relation.by });
                 const relationItem = `<div class="alert alert-success" role="alert" data-type="relation">${actor1[0]?.name} ${qualifier[0]?.name}  ${actor2[0]?.name}<div class="close" data-id="${relation.$loki}"><i class="fas fa-times"></i></div></div>`;
                 relationsList += relationItem;
             }
@@ -277,7 +375,7 @@ class DomHandler {
         document.querySelectorAll(".close").forEach((closeButton) => {
             closeButton.addEventListener('click', (event) => {
                 const id = event.currentTarget.dataset.id;
-                lokiDb.relations.remove(parseInt(id));
+                GlobalService.lokiDb.relations.remove(parseInt(id));
                 this.updateDomEvent();
                 this.renderGraph();
             });
@@ -301,7 +399,7 @@ class DomHandler {
 
                 if (element.parentNode.classList.contains("emettor")) {
                     if (event.ctrlKey) {
-                        lokiDb.nodes.findAndRemove({ id: element.dataset.id });
+                        GlobalService.lokiDb.nodes.findAndRemove({ id: element.dataset.id });
                     } else {
                         document.querySelector("#emettor").dataset.id = element.dataset.id;
                         document.querySelector("#emettor").dataset.name = element.dataset.name;
@@ -321,7 +419,7 @@ class DomHandler {
 
                 if (element.parentNode.classList.contains("receptor")) {
                     if (event.ctrlKey) {
-                        lokiDb.nodes.findAndRemove({ id: element.dataset.id });
+                        GlobalService.lokiDb.nodes.findAndRemove({ id: element.dataset.id });
                     } else {
                         document.querySelector("#receptor").dataset.id = element.dataset.id;
                         document.querySelector("#receptor").dataset.name = element.dataset.name;
@@ -343,13 +441,13 @@ class DomHandler {
                         const receptorElement = document.querySelector("#receptor");
                         const qualifierElement = document.querySelector("#qualifier");
                         try {
-                            lokiDb.addRelation(emettorElement.dataset.id, qualifierElement.dataset.id, receptorElement.dataset.id);
+                            GlobalService.lokiDb.addRelation(emettorElement.dataset.id, qualifierElement.dataset.id, receptorElement.dataset.id);
                         } catch (error) {
                             ipcRenderer.invoke('alert:message', { message: error, icon: "error" });
                         }
 
                         this.renderGraph();
-                        Utils.emptyRelationChunks();
+                        GlobalService.Utils.emptyRelationChunks();
                     }
                 }
                 this.updateDomEvent();
@@ -366,9 +464,9 @@ class DomHandler {
         //    | (____/\| )   ( || (____/\| (____/\|  /  \ \    \   /  ___) (___/\____) |___) (___| )___) )___) (___| (____/\___) (___   | |      | |     | (___) || )        | )___) )| (___) |   | |      | |   | (___) || )  \  |/\____) |
         //    (_______/|/     \|(_______/(_______/|_/    \/     \_/   \_______/\_______)\_______/|/ \___/ \_______/(_______/\_______/   )_(      \_/     (_______)|/         |/ \___/ (_______)   )_(      )_(   (_______)|/    )_)\_______)
 
-        const relationsVisibility = lokiDb.getRelations().length > 0;
-        const actorsVisibility = lokiDb.getActors().length > 0;
-        const qualifierVisibility = lokiDb.getQualifiers().length > 0;
+        const relationsVisibility = GlobalService.lokiDb.getRelations().length > 0;
+        const actorsVisibility = GlobalService.lokiDb.getActors().length > 0;
+        const qualifierVisibility = GlobalService.lokiDb.getQualifiers().length > 0;
         document.getElementById("save-image").classList.toggle("visible", relationsVisibility);
         document.getElementById("graph").classList.toggle("visible", relationsVisibility);
         document.getElementById("save-configuration").classList.toggle("visible", actorsVisibility);

@@ -1,0 +1,13 @@
+Sociogramme Roadmap
+
+- Ajout d'images
+- POssibilités de stockage cloud
+
+
+Images : 
+- Retrieve image on drop
+- convert to base64
+- use base 64 in css for node
+
+- C'est lacteur qui a sa photo
+- Un acteur peut être présent plusieurs fois
