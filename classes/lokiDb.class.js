@@ -57,7 +57,7 @@ class LokiDb {
                 by: receptorId,
                 to: qualifierId
             });
-        }else {
+        } else {
             throw "Cette relation existe déjà";
         }
     }
@@ -66,20 +66,31 @@ class LokiDb {
         return this.relations.find();
     }
 
-    addNode(name, type) {
-        const id = type + Math.random().toString(36).substring(3);
-        if (this.nodes.find({ name: name }).length == 0) {
-            const node = this.nodes.insert({ name: name, id: id, type: type });
-            
+    /**
+     * Add node, inferring attributes from payload
+     * @param {*} name 
+     * @param {*} type 
+     */
+    addNode(payload, type) {
+        let node = {};
+        node.id = type + Math.random().toString(36).substring(3);
+        node.type = type;
+
+        for (let attribute in payload) {
+            node[attribute] = payload[attribute];
+        }
+
+        if (this.nodes.find({ name: node.name }).length == 0) {
+            const insertedNode = this.nodes.insert(node);
         }
     }
 
     /**
      * Add a single actor in db
      */
-    addActor(name) {
-        if (name) {
-            this.addNode(name, "actor");
+    addActor(payload) {
+        if (payload.name) {
+            this.addNode(payload, "actor");
         }
     }
 
@@ -90,9 +101,9 @@ class LokiDb {
     /**
      * Add a single qualifier in db
      */
-    addQualifier(name) {
-        if (name) {
-            this.addNode(name, "qualifier");
+    addQualifier(payload) {
+        if (payload.name) {
+            this.addNode(payload, "qualifier");
         }
     }
 

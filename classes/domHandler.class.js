@@ -43,7 +43,7 @@ class DomHandler {
      */
     addActor() {
         const name = document.querySelector("#actorname").value;
-        GlobalService.lokiDb.addActor(name);
+        GlobalService.lokiDb.addActor({ name: name });
         this.updateDomEvent();
     }
 
@@ -72,7 +72,7 @@ class DomHandler {
      */
     addQualifier() {
         const qualifier = document.querySelector("#qualifiername").value;
-        GlobalService.lokiDb.addQualifier(qualifier);
+        GlobalService.lokiDb.addQualifier({ name: qualifier });
         this.updateDomEvent();
     }
 
@@ -107,11 +107,20 @@ class DomHandler {
             const id = event.detail.getAttribute("id");
             const node = GlobalService.lokiDb.nodes.find({ id: id });
 
+            console.info("Node clicked => ", node);
+
             const form = document.querySelector(".cellDetails");
+            form.reset();
+
+            //We fill form
             for (let attribute in node[0]) {
                 if (form[attribute]) {
                     form[attribute].value = node[0][attribute];
                 }
+            }
+            const image = document.querySelector(".nodeImage");
+            if (node[0].imageDataURL) {
+                image.src = node[0].imageDataURL;
             }
 
         })
@@ -174,15 +183,16 @@ class DomHandler {
          */
         form.addEventListener("submit", (event) => {
             event.preventDefault();
-            console.info(" Form => ", form);
-            console.info("Submitted");
 
             const node = GlobalService.lokiDb.nodes.findOne({ id: form.id.value });
-            console.info("found node ", node);
             node.name = form.name.value;
             node.details = form.details.value;
             node.imageDataURL = form.imageDataURL.value;
             GlobalService.lokiDb.nodes.update(node);
+
+            this.updateDomEvent();
+            this.renderGraph();
+
         })
     }
 
@@ -240,10 +250,12 @@ class DomHandler {
             };
 
             GlobalService.lokiDb.nodes.find().forEach((node) => {
-                jsonConfiguration.nodes.push({ 'name': node.name, 'id': node.id, 'type': node.type });
+                const { $loki, meta, ...cleanedNode } = node;
+                jsonConfiguration.nodes.push(cleanedNode);
             });
-            GlobalService.lokiDb.getRelations().forEach((relation) => {
-                jsonConfiguration.relations.push({ 'from': relation.from, 'by': relation.by, 'to': relation.to, 'id': relation.id });
+            GlobalService.lokiDb.getRelations().forEach((node) => {
+                const { $loki, meta, ...cleanedNode } = node;
+                jsonConfiguration.relations.push(cleanedNode);
             });
 
             ipcRenderer.invoke('dialog:save').then(path => {
@@ -312,14 +324,20 @@ class DomHandler {
          * Actors tags update
          */
         const actorsFound = GlobalService.lokiDb.getActors();
+        console.info("actorsFound ", actorsFound);
+
         let actorsTag = "";
         for (let i = 0; i < actorsFound.length; i++) {
+            console.info("actorsFound[i] ", actorsFound[i]);
             const id = actorsFound[i].id;
             const name = actorsFound[i].name;
             const selected = actorsFound[i].selected ? 'selected' : '';
             const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one ' + selected + '" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '</a>';
             actorsTag += actorTag;
         }
+
+        console.info("actorsTag ", actorsTag);
+
         document.querySelectorAll(".actorsTag").forEach((actorTagList) => {
             actorTagList.innerHTML = actorsTag;
             if (actorTagList.classList.contains("emettor")) {
