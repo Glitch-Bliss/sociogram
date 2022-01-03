@@ -82,6 +82,9 @@ class GraphTools {
         // Resizes the container
         this.graph.setResizeContainer(false);
 
+        //Set the zoom factor
+        this.graph.zoomFactor = 1.05;
+
         // Adding cell mouse listeners
         this.graph.addMouseListener(
             {
@@ -281,6 +284,7 @@ class GraphTools {
         });
         document.querySelector("#mxHierarchicalLayout").addEventListener('click', (event) => {
             const layout = new this.mx.mxHierarchicalLayout(this.graph);
+            layout.orientation = this.mx.mxConstants.DIRECTION_WEST;
             layout.execute(this.parent);
         });
     }

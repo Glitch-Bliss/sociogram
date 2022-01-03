@@ -476,14 +476,13 @@ a.animated-button.thar-four:before {
   display: block;
 }
 
-body {
-  background-color: #363636;
-}
-
 header {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 2;
   width: 100%;
   background: #f7ca18;
-  margin: 0 0 30px;
   height: 50px;
   padding: 5px 5px;
 }
@@ -491,6 +490,58 @@ header .input-group input.form-control {
   background: #363636;
   width: 100px;
   color: white;
+}
+
+#relations {
+  position: relative;
+  z-index: 2;
+  background: #363636;
+  padding: 30px;
+}
+#relations .actorsTag,
+#relations .qualifiersTag {
+  width: 100%;
+  text-align: center;
+}
+#relations .tagsRow {
+  margin-bottom: 20px;
+}
+#relations .tag,
+#relations .buttonTag {
+  font-family: "Open Sans", sans-serif;
+  color: white;
+  height: 40px;
+  line-height: 36px;
+  padding: 0 5px;
+  margin: 2px;
+  text-align: center;
+  cursor: pointer;
+}
+#relations .tag i,
+#relations .buttonTag i {
+  padding-left: 2px;
+}
+#relations #relationsList .alert {
+  margin-bottom: 5px;
+}
+#relations #relationsList .alert .close {
+  float: right;
+  cursor: pointer;
+  font-size: 25px;
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+}
+#relations #relationsList .alert-success {
+  background-color: #bdd5ea;
+  border-color: #9e6ab5;
+  border-radius: 0;
+}
+
+body {
+  background-color: #363636;
 }
 
 footer {
@@ -560,61 +611,18 @@ h2.visible {
   top: 100%;
 }
 
-.actorsTag,
-.qualifiersTag {
-  width: 100%;
-  text-align: center;
-}
-
-.tagsRow {
-  margin-bottom: 20px;
-}
-
-.tag,
-.buttonTag {
-  font-family: "Open Sans", sans-serif;
-  color: white;
-  height: 40px;
-  line-height: 36px;
-  padding: 0 5px;
-  margin: 2px;
-  text-align: center;
-  cursor: pointer;
-}
-.tag i,
-.buttonTag i {
-  padding-left: 2px;
-}
-
-#relationsList .alert {
-  margin-bottom: 5px;
-}
-#relationsList .alert .close {
-  float: right;
-  cursor: pointer;
-  font-size: 25px;
-  display: inline-block;
-  width: 25px;
-  height: 25px;
-  line-height: 25px;
-  text-align: center;
-}
-#relationsList .alert-success {
-  background-color: #bdd5ea;
-  border-color: #9e6ab5;
-  border-radius: 0;
-}
-
 .hide {
   display: none;
 }
 
 .graphContainer {
-  position: relative;
+  position: absolute;
   width: 100%;
-  height: 500px;
+  height: 100%;
   background: white;
   overflow: hidden;
+  top: 0;
+  z-index: 1;
 }
 
 .details {

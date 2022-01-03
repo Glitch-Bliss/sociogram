@@ -1,6 +1,6 @@
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron')
 const path = require('path')
 //https://electron.guide/electron-alert/
 const Alert = require("electron-alert");
@@ -8,11 +8,13 @@ const Alert = require("electron-alert");
 function createWindow() {
 
     var image = __dirname + '/assets/app-icon.png';
+    
+    var mainScreen = screen.getPrimaryDisplay();
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 1500,
-        height: 1200,
+        width: mainScreen.size.width * 0.8,
+        height: mainScreen.size.height * 0.8,
         show: true,
         icon: image,
         autoHideMenuBar: true,

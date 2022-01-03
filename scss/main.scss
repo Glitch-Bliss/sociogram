@@ -1,23 +1,11 @@
 //@import "~bootstrap/scss/bootstrap";
 @import "buttons.scss";
 @import "actorForm.scss";
+@import "topMenu.scss";
+@import "relations.scss";
 
 body {
     background-color: rgb(54, 54, 54);
-}
-
-header {
-    width: 100%;
-    background: #f7ca18;
-    margin: 0 0 30px;
-    height: 50px;
-    padding: 5px 5px;
-
-    .input-group input.form-control {
-        background: #363636;
-        width: 100px;
-        color: white;
-    }
 }
 
 footer {
@@ -99,65 +87,18 @@ button {
     }
 }
 
-.actorsTag,
-.qualifiersTag {
-    width: 100%;
-    text-align: center;
-}
-
-.tagsRow {
-    margin-bottom: 20px;
-}
-
-.tag,
-.buttonTag {
-    font-family: 'Open Sans', sans-serif;
-    color: white;
-    height: 40px;
-    line-height: 36px;
-    padding: 0 5px;
-    margin: 2px;
-    text-align: center;
-    cursor: pointer;
-
-    i {
-        padding-left: 2px;
-    }
-}
-
-#relationsList {
-    .alert {
-        margin-bottom: 5px;
-
-        .close {
-            float: right;
-            cursor: pointer;
-            font-size: 25px;
-            display: inline-block;
-            width: 25px;
-            height: 25px;
-            line-height: 25px;
-            text-align: center;
-        }
-    }
-
-    .alert-success {
-        background-color: #bdd5ea;
-        border-color: #9e6ab5;
-        border-radius: 0;
-    }
-}
-
 .hide {
     display: none;
 }
 
 .graphContainer {
-    position: relative;
+    position: absolute;
     width: 100%;
-    height: 500px;
+    height: 100%;
     background: white;
     overflow: hidden;
+    top: 0;
+    z-index: 1;
 }
 
 .details {

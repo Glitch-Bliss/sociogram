@@ -312,8 +312,7 @@ class DomHandler {
                     console.error('An element is missing from relation', relation);
                 }
             }
-        );
-        document.querySelector(".help").classList.add("hide");
+        );        
     }
 
     /**
@@ -489,8 +488,7 @@ class DomHandler {
         document.getElementById("graph").classList.toggle("visible", relationsVisibility);
         document.getElementById("save-configuration").classList.toggle("visible", actorsVisibility);
         document.querySelectorAll(".actorTitle").forEach((title) => title.classList.toggle("visible", actorsVisibility));
-        document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));
-        document.querySelector(".help").classList.toggle("visible", !qualifierVisibility && !actorsVisibility && !relationsVisibility);
+        document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));        
     }
 }
 
