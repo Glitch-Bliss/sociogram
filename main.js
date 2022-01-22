@@ -8,7 +8,7 @@ const Alert = require("electron-alert");
 function createWindow() {
 
     var image = __dirname + '/assets/app-icon.png';
-    
+
     var mainScreen = screen.getPrimaryDisplay();
 
     // Create the browser window.
@@ -21,6 +21,7 @@ function createWindow() {
         webPreferences: {
             devTools: true,
             enableRemoteModule: true,
+            contextIsolation: false,
             preload: path.join(__dirname, 'preload_main.js'),
         }
     })

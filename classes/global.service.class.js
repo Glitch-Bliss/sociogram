@@ -5,8 +5,15 @@ class GlobalService {
     Utils = require("./utils.class");
     GraphTools = require("./graphTools.class");
 
-    cellclickEvent = new CustomEvent("cellClick");
+    trinity = {};
+
     constructor() {
+
+        // We track the selected actors for the creation of a new relation
+        document.addEventListener("actorSelected", (event) => {
+            const socket = event.detail.socket;
+            this.trinity[socket] = event.detail.actor;
+        })
     }
 
 }

@@ -55,20 +55,25 @@ class GraphTools {
         this.graph.htmlLabels = true;
 
         // Sets global styles
-        let style = this.graph.getStylesheet().getDefaultEdgeStyle();
-        style[this.mx.mxConstants.STYLE_EDGE] = this.mx.mxEdgeStyle.ElbowConnector;
-        style[this.mx.mxConstants.STYLE_ROUNDED] = true;
-        // style[this.mx.mxConstants.STYLE_SPACING] = 10;
-        // style[this.mx.mxConstants.STYLE_SPACING_TOP] = 10;
-        // style[this.mx.mxConstants.STYLE_SPACING_BOTTOM] = 10;
-        style[this.mx.mxConstants.STYLE_SHAPE] = this.mx.mxConstants.SHAPE_CONNECTOR;
-        style[this.mx.mxConstants.STYLE_STROKECOLOR] = '#6482B9';
-        style[this.mx.mxConstants.STYLE_ALIGN] = this.mx.mxConstants.ALIGN_CENTER;
-        style[this.mx.mxConstants.STYLE_VERTICAL_ALIGN] = this.mx.mxConstants.ALIGN_MIDDLE;
-        style[this.mx.mxConstants.STYLE_EDGE] = this.mx.mxEdgeStyle.ElbowConnector;
-        style[this.mx.mxConstants.STYLE_ENDARROW] = this.mx.mxConstants.ARROW_CLASSIC;
-        style[this.mx.mxConstants.STYLE_FONTSIZE] = '10';
-        this.graph.getStylesheet().putDefaultEdgeStyle(style);
+        let styleEdge = this.graph.getStylesheet().getDefaultEdgeStyle();
+        styleEdge[this.mx.mxConstants.STYLE_EDGE] = this.mx.mxEdgeStyle.ElbowConnector;
+        styleEdge[this.mx.mxConstants.STYLE_ROUNDED] = true;
+        // styleEdge[this.mx.mxConstants.STYLE_SPACING] = 10;
+        // styleEdge[this.mx.mxConstants.STYLE_SPACING_TOP] = 10;
+        // styleEdge[this.mx.mxConstants.STYLE_SPACING_BOTTOM] = 10;
+        styleEdge[this.mx.mxConstants.STYLE_SHAPE] = this.mx.mxConstants.SHAPE_CONNECTOR;
+        styleEdge[this.mx.mxConstants.STYLE_STROKECOLOR] = '#6482B9';
+        styleEdge[this.mx.mxConstants.STYLE_ALIGN] = this.mx.mxConstants.ALIGN_CENTER;
+        styleEdge[this.mx.mxConstants.STYLE_VERTICAL_ALIGN] = this.mx.mxConstants.ALIGN_MIDDLE;
+        styleEdge[this.mx.mxConstants.STYLE_ENDARROW] = this.mx.mxConstants.ARROW_CLASSIC;
+        styleEdge[this.mx.mxConstants.STYLE_FONTSIZE] = '10';
+        styleEdge[this.mx.mxConstants.STYLE_FONTCOLOR] = '#ffffff';
+        this.graph.getStylesheet().putDefaultEdgeStyle(styleEdge);
+
+        let styleVertex = this.graph.getStylesheet().getDefaultVertexStyle();
+        styleVertex[this.mx.mxConstants.STYLE_SPACING_TOP] = 30;
+        styleVertex[this.mx.mxConstants.STYLE_SPACING_BOTTOM] = 30;
+        this.graph.getStylesheet().putDefaultVertexStyle(styleVertex);
 
         // Autosize labels on insert where autosize=1
         this.graph.autoSizeCellsOnAdd = true;
@@ -91,7 +96,11 @@ class GraphTools {
                 mouseUp: function (sender, me) { },
                 mouseDown: (sender, evt) => {
                     let cell = evt.getCell();
-                    this.addCellClickListener(cell);
+                    if (cell) {
+                        if (this.mx.mxUtils.isNode(cell.value)) {
+                            this.addCellClickListener(cell);
+                        }
+                    }
                 },
                 mouseMove: (sender, evt) => {
                     let cell = this.graph.view.getState(evt.getCell());
@@ -101,6 +110,51 @@ class GraphTools {
                 }
             }
         );
+
+        /**
+         * This function is called to render the inner html of cell
+         */
+        this.graph.convertValueToString = (cell) => {
+            if (this.mx.mxUtils.isNode(cell.value)) {
+                // Returns a DOM for the label
+                let div = document.createElement('div');
+                this.mx.mxUtils.br(div);
+                const name = cell.getAttribute('name');
+                const image = cell.getAttribute('miniatureDataURL');
+                const id = "img_" + cell.getAttribute("id");
+
+                div.innerHTML += `<div style="padding:5px;">${name}</div>`;
+                if (image) {
+                    const imageElement = new Image();
+                    imageElement.width = 50;
+                    imageElement.src = image;
+                    imageElement.classList.add(id);
+
+                    div.innerHTML += '<div>' + imageElement.outerHTML + '</div>';
+                }
+                this.mx.mxUtils.br(div);
+                return div;
+            }
+
+            return '';
+        };
+
+        /**
+         * This function is called each time we call updateCellSize on the created cell
+         */
+        let graphGetPreferredSizeForCell = this.graph.getPreferredSizeForCell;
+        this.graph.getPreferredSizeForCell = function (cell) {
+            let rectangle = graphGetPreferredSizeForCell.apply(this, arguments);
+
+            const image = document.querySelector(".img_" + cell.getAttribute("id"));
+            if (image) {
+                console.info("cell image height ? ", image.height);
+                rectangle.height = image.height + 50;
+                rectangle.width = 150;
+            }
+
+            return rectangle;
+        };
     }
 
 
@@ -150,22 +204,63 @@ class GraphTools {
     addOverlay(cell, doc) {
 
         // If doc has a valid image
-        if (doc.imageDataURL) {
-            // Creates a new overlay with an image and a tooltip
-            let overlay = new this.mx.mxCellOverlay(new this.mx.mxImage("./assets/img_icon.jpg", 15, 15), 'With image', this.mx.mxConstants.ALIGN_RIGHT, this.mx.mxConstants.ALIGN_TOP, { x: 3, y: -3 });
-            overlay.cursor = 'pointer';
+        console.info("DOC ", doc);
+        const miniatureDataURL = doc.miniatureDataURL;
+        if (miniatureDataURL) {
+            console.info("miniatureDataURL", miniatureDataURL);
+            const overlayImage = document.createElement("img");
+            overlayImage.src = miniatureDataURL;
 
-            // Does not work (yet ? :/ )
-            overlay.addListener('mouseMove', (sender, evt2) => {
-                console.info("hovered");
-            });
+            overlayImage.onload = () => {
+                // Creates a new overlay with an image and a tooltip
+                let overlay = new this.mx.mxCellOverlay(new this.mx.mxImage(miniatureDataURL, overlayImage.width, overlayImage.height), 'With image', this.mx.mxConstants.ALIGN_RIGHT, this.mx.mxConstants.ALIGN_TOP, { x: 3, y: -3 });
+                overlay.cursor = 'pointer';
 
-            overlay.addListener(this.mx.mxEvent.CLICK, (sender, evt2) => {
-                console.info("clicked");
-            });
+                // Does not work (yet ? :/ )
+                overlay.addListener('mouseMove', (sender, evt2) => {
+                    console.info("hovered");
+                });
 
-            // // Sets the overlay for the cell in the graph
-            this.graph.addCellOverlay(cell, overlay);
+                overlay.addListener(this.mx.mxEvent.CLICK, (sender, evt2) => {
+                    console.info("clicked");
+                });
+
+                // // Sets the overlay for the cell in the graph
+                this.graph.addCellOverlay(cell, overlay);
+            }
+
+        }
+    }
+
+    /**
+     * Update graph layout
+     */
+    updateLayout() {
+        const layout = new this.mx.mxHierarchicalLayout(this.graph);
+        // this.mx.mxConstants.DIRECTION_WEST || this.mx.mxConstants.DIRECTION_NORTH;
+        layout.orientation = this.mx.mxConstants.DIRECTION_WEST;
+        layout.execute(this.parent);
+        this.graph.center();
+    }
+
+    /**
+     * Launch cell size update after defining image size
+     * @param {*} cell 
+     */
+    defineCellSize(cell) {
+        const imgData = cell.getAttribute('miniatureDataURL');
+
+        if (imgData) {
+            const imageElement = new Image();
+            imageElement.width = 50;
+            imageElement.src = imgData;
+            imageElement.onload = () => {
+                this.graph.updateCellSize(cell);
+                this.updateLayout();
+            }
+        } else {
+            this.graph.autoSizeCell(cell);
+            this.updateLayout();
         }
     }
 
@@ -186,7 +281,7 @@ class GraphTools {
         let relation = this.documents[by.id]?.doc || this.addDocument("relation", by);
 
         let style = new Object();
-        // style[this.mx.mxConstants.STYLE_SHAPE] = this.mx.mxConstants.SHAPE_IMAGE;
+        style[this.mx.mxConstants.STYLE_SHAPE] = this.mx.mxConstants.SHAPE_LABEL;
         // style[this.mx.mxConstants.STYLE_PERIMETER] = this.mx.mxPerimeter.RectanglePerimeter;
         // style[this.mx.mxConstants.STYLE_STROKECOLOR] = '#000000';
         // style[this.mx.mxConstants.STYLE_FONTCOLOR] = '#000000';
@@ -198,7 +293,7 @@ class GraphTools {
         // style[this.mx.mxConstants.STYLE_IMAGE] = 'images/icons48/gear.png';
         // style[this.mx.mxConstants.STYLE_IMAGE_WIDTH] = '48';
         // style[this.mx.mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-        // style[this.mx.mxConstants.STYLE_SPACING_TOP] = '56';
+        // style[this.mx.mxConstants.STYLE_SPACING_TOP] = '56';        
         style[this.mx.mxConstants.STYLE_SPACING] = '10';
 
         // @TODO add listener to after cell resize to set style
@@ -206,30 +301,26 @@ class GraphTools {
         try {
             this.graph.getModel().beginUpdate();
             v1 = v1 || this.graph.insertVertex(this.parent, null, actor1, 40, 40, 80, 30, from.id);
-            this.addOverlay(v1, from);
+            // this.addOverlay(v1, from);
             style = this.mx.mxUtils.clone(style);
-            this.graph.getStylesheet().putCellStyle(from.id, style);
+            this.defineCellSize(v1);
 
             this.documents[from.id].graph = v1;
             v2 = v2 || this.graph.insertVertex(this.parent, null, actor2, 40, 40, 80, 30, to.id);
-            this.addOverlay(v2, to);
+            // this.addOverlay(v2, to);
             style = this.mx.mxUtils.clone(style);
-            this.graph.getStylesheet().putCellStyle(to.id, style);
+            this.defineCellSize(v2);
+            // this.graph.getStylesheet().putCellStyle(to.id, style);
 
             this.documents[to.id].graph = v2;
-            rel = this.graph.insertEdge(this.parent, null, relation, v1, v2, 'verticalAlign=bottom');
+            rel = this.graph.insertEdge(this.parent, null, relation, v1, v2);
             this.documents[by.id].graph = rel;
+
         } catch (error) {
             console.error(error);
         } finally {
             this.graph.getModel().endUpdate();
-
-            const layout = new this.mx.mxHierarchicalLayout(this.graph);
-            // this.mx.mxConstants.DIRECTION_WEST || this.mx.mxConstants.DIRECTION_NORTH;
-            layout.orientation = this.mx.mxConstants.DIRECTION_WEST;
-            layout.execute(this.parent);
-
-            this.graph.center();
+            this.updateLayout();
         }
     }
 

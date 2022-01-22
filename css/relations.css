@@ -1,36 +1,29 @@
 #relations {
   position: relative;
   z-index: 2;
-  background: #363636;
   padding: 30px;
 }
-#relations .actorsTag,
-#relations .qualifiersTag {
-  width: 100%;
-  text-align: center;
+
+.relationsList {
+  display: flex;
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  align-content: stretch;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: stretch;
+  height: 54px;
+  overflow: hidden;
+  z-index: 3;
 }
-#relations .tagsRow {
-  margin-bottom: 20px;
+.relationsList:hover {
+  height: auto;
 }
-#relations .tag,
-#relations .buttonTag {
-  font-family: "Open Sans", sans-serif;
-  color: white;
-  height: 40px;
-  line-height: 36px;
-  padding: 0 5px;
-  margin: 2px;
-  text-align: center;
-  cursor: pointer;
-}
-#relations .tag i,
-#relations .buttonTag i {
-  padding-left: 2px;
-}
-#relations #relationsList .alert {
+.relationsList .alert {
   margin-bottom: 5px;
 }
-#relations #relationsList .alert .close {
+.relationsList .alert .close {
   float: right;
   cursor: pointer;
   font-size: 25px;
@@ -40,10 +33,80 @@
   line-height: 25px;
   text-align: center;
 }
-#relations #relationsList .alert-success {
+.relationsList .alert-success {
   background-color: #bdd5ea;
   border-color: #9e6ab5;
   border-radius: 0;
+}
+
+.actorsTag .tag {
+  background: #2f5070;
+}
+
+.qualifiersTag .tag {
+  background: #582525;
+}
+
+.actorsTag,
+.qualifiersTag,
+tag-list {
+  transition: all 0.2s ease-out;
+  position: relative;
+  width: 33%;
+  z-index: 3;
+  height: 49px;
+  max-height: 49px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: flex-start;
+  align-items: stretch;
+  overflow: hidden;
+}
+.actorsTag:hover,
+.qualifiersTag:hover,
+tag-list:hover {
+  height: auto;
+  max-height: 1800px;
+}
+.actorsTag .tag,
+.qualifiersTag .tag,
+tag-list .tag {
+  margin: 3px;
+  width: 32%;
+}
+
+.tagsRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.tag,
+.buttonTag {
+  font-family: "Open Sans", sans-serif;
+  color: white;
+  height: 40px;
+  line-height: 36px;
+  padding: 0 5px;
+  margin: 2px;
+  text-align: center;
+  cursor: pointer;
+}
+.tag i,
+.buttonTag i {
+  padding-left: 2px;
+}
+
+.selected {
+  background: red;
+}
+.selected::before {
+  top: 100%;
 }
 
 /*# sourceMappingURL=relations.css.map */

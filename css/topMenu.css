@@ -13,5 +13,11 @@ header .input-group input.form-control {
   width: 100px;
   color: white;
 }
+header #actorname {
+  background: #2f5070;
+}
+header #qualifiername {
+  background: #582525;
+}
 
 /*# sourceMappingURL=topMenu.css.map */

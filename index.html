@@ -7,9 +7,7 @@
   <title>Sociogramme minute</title>
   <meta name="description" content="Outil de création de sociogrammes">
   <meta name="author" content="Glitch Bliss">
-  <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"
-    integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0"
-    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Caveat+Brush" rel="stylesheet">
@@ -19,79 +17,32 @@
 </head>
 
 <body>
+
   <header class="container-fluid">
-    <section>
-      <form class="row">
-        <input type="hidden" data-id="" data-name="" name="emettor" id="emettor" />
-        <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier" />
-        <input type="hidden" data-id="" data-name="" name="receptor" id="receptor" />
 
-        <input id="load-configuration-dialog" type="file" accept="application/json" name="Charger configuration"
-          value="Ouvrir configuration" />
-        <button id="load-configuration" class="btn btn-outline-secondary" type="button" id="button-qualifier"><i
-            class="fas fa-folder-open"></i></button>
-        <button id="save-configuration" class="btn btn-outline-secondary" type="button" id="button-qualifier"><i
-            class="fas fa-save"></i></button>
-
-        <article class="col-sm-4 col-md-2">
-          <div class="input-group">
-            <input id="actorname" type="text" class="form-control" placeholder="Acteur à ajouter"
-              aria-label="Acteur à ajouter" aria-describedby="button-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" id="button-actor"><i
-                  class="fas fa-plus"></i></button>
-            </div>
-          </div>
-        </article>
-        <article class="col-sm-4 col-md-2">
-          <div class="input-group">
-            <input id="qualifiername" type="text" class="form-control" placeholder="Qualificatif à ajouter"
-              aria-label="Qualificatif à ajouter" aria-describedby="button-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" id="button-qualifier"><i
-                  class="fas fa-plus"></i></button>
-            </div>
-          </div>
-        </article>
-      </form>
-    </section>
+    <header-menu></header-menu>
+    <input type="hidden" data-id="" data-name="" name="emettor" id="emettor" />
+    <input type="hidden" data-id="" data-name="" name="qualifier" id="qualifier" />
+    <input type="hidden" data-id="" data-name="" name="receptor" id="receptor" />
   </header>
-  <section id="relations">
-    <section class="row tagsRow">
-      <article class="col-4 align-content-center">
-        <h2 class="actorTitle">Émetteur =></h2>
-        <div class="actorsTag emettor">
-        </div>
-      </article>
+  <section class="tagsRow">
+    <tag-list class="actorsTag emettor" type="actors" socket="emettor"></tag-list>
+    <tag-list class="qualifiersTag qualifier" type="qualifiers" socket="qualifier"></tag-list>
+    <tag-list class="actorsTag receptor" type="actors" socket="receptor"></tag-list>
+  </section>
 
-      <article class="col-4 align-content-center">
-        <h2 class="qualifierTitle">Qualifiant =></h2>
-        <div class="qualifiersTag qualifier">
-        </div>
-      </article>
-
-      <article class="col-4 align-content-center">
-        <h2 class="actorTitle">Récepteur</h2>
-        <div class="actorsTag receptor">
-        </div>
-      </article>
-    </section>
-    <section class="row">
-      <div class="col-8 align-content-center text-center">
-        <div id="graph">
-        </div>
-        <a id="save-image" class="buttonTag animated-button thar-one" href="">Télécharger sociogramme</a>
+  <section class="row" style="display: none;">
+    <div class="col-8 align-content-center text-center">
+      <div id="graph">
       </div>
-      <div class="col-4">
-        <did id="relationsList"></did>
-      </div>
-    </section>
+      <a id="save-image" class="buttonTag animated-button thar-three" href="">Télécharger sociogramme</a>
+    </div>
   </section>
 
   <section class="graphContainer">
   </section>
 
-  <aside>
+  <aside style="display:none">
     <button type="button" id="mxCircleLayout">
       mxCircleLayout
     </button>
@@ -125,6 +76,7 @@
     </script> -->
     <form class="cellDetails">
       <input type="hidden" name="id" />
+      <input type="hidden" name="miniatureDataURL" />
       <input type="hidden" name="imageDataURL" />
       <input type="text" name="name" class="cell" />
       <textarea class="details" name="details" class="cell"></textarea>
@@ -135,9 +87,10 @@
     </form>
   </section>
 
-  <footer>
+  <article class="relationsList"></article>
+  <!-- <footer>
     Sociogramaker 0.2 | <a href="mailto:contact@kami.kiwi" title="contact">Contact</a>
-  </footer>
+  </footer> -->
 
 </body>
 

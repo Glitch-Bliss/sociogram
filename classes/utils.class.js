@@ -33,15 +33,6 @@ class Utils {
         return saveSvgAsPng(document.getElementById(id), "sociographer.png");
     }
 
-    static emptyRelationChunks() {
-        document.querySelector("#emettor").dataset.id = "";
-        document.querySelector("#emettor").dataset.name = "";
-        document.querySelector("#qualifier").dataset.id = "";
-        document.querySelector("#qualifier").dataset.name = "";
-        document.querySelector("#receptor").dataset.id = "";
-        document.querySelector("#receptor").dataset.name = "";
-    }
-
 }
 
 module.exports = Utils;

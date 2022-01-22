@@ -31,72 +31,6 @@ class DomHandler {
     }
 
     /**
-     * Init the form for cell editing
-     * Toggles visibility
-     */
-    setCellsForm() {
-
-    }
-
-    /**
-     * When adding new actor
-     */
-    addActor() {
-        const name = document.querySelector("#actorname").value;
-        GlobalService.lokiDb.addActor({ name: name });
-        this.updateDomEvent();
-    }
-
-    /**
-     * Add actor when clicked on button
-     */
-    addActorButtonListener() {
-        document.querySelector("#button-actor").addEventListener('click', () => this.addActor());
-    }
-
-    /**
-     * Add actor when enter keyup
-     */
-    addActorKeyListener() {
-        document.querySelector("#actorname").addEventListener('keyup', (event) => {
-            if (event.keyCode === 13) {
-                this.addActor();
-                document.querySelector("#actorname").value = "";
-                document.querySelector("#actorname").focus();
-            }
-        });
-    }
-
-    /**
-     * Adds a new qualifier element
-     */
-    addQualifier() {
-        const qualifier = document.querySelector("#qualifiername").value;
-        GlobalService.lokiDb.addQualifier({ name: qualifier });
-        this.updateDomEvent();
-    }
-
-    /**
-     * Add actor when clicked on button
-     */
-    addQualifierButtonListener() {
-        document.querySelector("#button-qualifier").addEventListener('click', () => this.addQualifier());
-    }
-
-    /**
-     * Add actor when enter keyup
-     */
-    addQualifierKeyListener() {
-        document.querySelector("#qualifiername").addEventListener('keyup', (event) => {
-            if (event.keyCode === 13) {
-                this.addQualifier();
-                document.querySelector("#qualifiername").value = "";
-                document.querySelector("#qualifiername").focus();
-            }
-        });
-    }
-
-    /**
      * Triggers when a graph cell is clicked
      */
     addCellClickListener() {
@@ -126,6 +60,10 @@ class DomHandler {
         })
     }
 
+
+    /**
+     * Updates datas from details cell form
+     */
     addActorFormListener() {
         const imageDrop = document.querySelector(".imageDrop");
         const form = document.querySelector(".cellDetails");
@@ -146,8 +84,6 @@ class DomHandler {
             imageDrop.addEventListener(eventName, (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-
-                console.info("Event ? ", event);
             });
         });
 
@@ -167,11 +103,47 @@ class DomHandler {
 
                     let fileReader = new FileReader();
                     fileReader.onloadend = () => {
-                        //The image is a base64 image now !!!
+
+                        // Image resizing
+                        let img = document.createElement("img");
                         const base64Image = fileReader.result;
-                        const image = document.querySelector(".nodeImage");
-                        image.src = base64Image;
-                        form.imageDataURL.value = base64Image;
+                        img.src = base64Image;
+
+                        img.onload = () => {
+                            let canvas = document.createElement("canvas");
+                            let ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
+
+                            let MAX_WIDTH = 50;
+                            let MAX_HEIGHT = 50;
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height *= MAX_WIDTH / width;
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width *= MAX_HEIGHT / height;
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, width, height);
+                            let miniatureDataurl = canvas.toDataURL();
+
+                            //The image is a base64 image now !!!
+                            // const base64Image = fileReader.result;
+                            const image = document.querySelector(".nodeImage");
+                            image.src = base64Image;
+                            form.miniatureDataURL.value = miniatureDataurl;
+                            form.imageDataURL.value = base64Image;
+                        }
                     }
                     fileReader.readAsDataURL(blob);
                 }
@@ -188,45 +160,12 @@ class DomHandler {
             node.name = form.name.value;
             node.details = form.details.value;
             node.imageDataURL = form.imageDataURL.value;
+            node.miniatureDataURL = form.miniatureDataURL.value;
             GlobalService.lokiDb.nodes.update(node);
 
             this.updateDomEvent();
             this.renderGraph();
-
         })
-    }
-
-    /**
-     * Add listener and behavior for load button
-     */
-    loadConfigurationListener() {
-        document.querySelector("#load-configuration").addEventListener('click', (event) => {
-            event.preventDefault();
-
-            ipcRenderer.invoke('dialog:open').then(result => {
-                try {
-                    let openedFile = fs.readFileSync(result.filePaths[0]);
-                    let jsonConfiguration = JSON.parse(openedFile);
-
-                    // GlobalService.lokiDb.nodes.removeDataOnly();
-                    GlobalService.lokiDb.nodes.insert(jsonConfiguration.nodes);
-                    // GlobalService.lokiDb.relations.removeDataOnly();
-                    GlobalService.lokiDb.relations.insert(jsonConfiguration.relations);
-
-                    console.info("GlobalService.lokiDb.nodes ", GlobalService.lokiDb.nodes);
-                    this.updateDomEvent();
-                    this.renderGraph();
-                } catch (error) {
-                    console.log(`Erreur lors de l'ouverture de ${result.filePaths[0]}`, error)
-                    const options = {
-                        type: 'error',
-                        title: 'Erreur d\'ouverture',
-                        message: `Erreur lors de l'ouverture de ${result.filePaths[0]}\n Message : ${error}`
-                    }
-                    ipcRenderer.invoke('dialog:message', options);
-                }
-            })
-        });
     }
 
     /**
@@ -240,61 +179,9 @@ class DomHandler {
     }
 
     /**
-     * Add listener and behavior for save button
-     */
-    saveConfigurationListener() {
-        document.querySelector("#save-configuration").addEventListener('click', (event) => {
-            let jsonConfiguration = {
-                "nodes": [],
-                "relations": []
-            };
-
-            GlobalService.lokiDb.nodes.find().forEach((node) => {
-                const { $loki, meta, ...cleanedNode } = node;
-                jsonConfiguration.nodes.push(cleanedNode);
-            });
-            GlobalService.lokiDb.getRelations().forEach((node) => {
-                const { $loki, meta, ...cleanedNode } = node;
-                jsonConfiguration.relations.push(cleanedNode);
-            });
-
-            ipcRenderer.invoke('dialog:save').then(path => {
-                if (path && path.filePath) {
-
-                    const sgPath = path.filePath;
-                    let data = JSON.stringify(jsonConfiguration)
-
-                    fs.writeFile(sgPath, data, (error) => {
-                        let options = {};
-                        try {
-                            if (error) throw error
-                            options = {
-                                type: 'info',
-                                title: 'Information',
-                                message: `Le Sociographe ${sgPath} a bien été sauvegardé.`
-                            }
-                        } catch (error) {
-                            console.log(`Erreur lors de la sauvegarde de ${sgPath}: `, error)
-                            options = {
-                                type: 'error',
-                                title: 'Erreur d\'enregistrement',
-                                message: `Le Sociographe n'a PAS été sauvegardé. \n Message : ${error}`
-                            }
-                        } finally {
-                            ipcRenderer.invoke('dialog:message', options);
-                        }
-                    })
-                }
-            })
-
-        });
-    }
-
-    /**
      * Handles graph rendering from lokidb relations
      */
     renderGraph = () => {
-
         // Graph rendering    
         GlobalService.GraphTools.init();
         GlobalService.GraphTools.addLayoutButtons();
@@ -312,66 +199,21 @@ class DomHandler {
                     console.error('An element is missing from relation', relation);
                 }
             }
-        );        
+        );
+    }
+
+    /**
+     * Initialize all components
+     */
+    createWebComponents() {
+        require("../web-components/header-menu/header-menu.class");
+        require("../web-components/tag-list/tag-list.class");
     }
 
     /**
      * Main upate func of the app lifecycle
      */
     updateDomEvent() {
-        /**
-         * Actors tags update
-         */
-        const actorsFound = GlobalService.lokiDb.getActors();
-        console.info("actorsFound ", actorsFound);
-
-        let actorsTag = "";
-        for (let i = 0; i < actorsFound.length; i++) {
-            console.info("actorsFound[i] ", actorsFound[i]);
-            const id = actorsFound[i].id;
-            const name = actorsFound[i].name;
-            const selected = actorsFound[i].selected ? 'selected' : '';
-            const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one ' + selected + '" data-id="' + id + '" data-name="' + name + '" data-type="actor">' + name + '</a>';
-            actorsTag += actorTag;
-        }
-
-        console.info("actorsTag ", actorsTag);
-
-        document.querySelectorAll(".actorsTag").forEach((actorTagList) => {
-            actorTagList.innerHTML = actorsTag;
-            if (actorTagList.classList.contains("emettor")) {
-                actorTagList.querySelectorAll(".tag").forEach((actorTag) => {
-                    if (actorTag.dataset.id == this.idActorSelected.emettor.id) {
-                        actorTag.classList.add("selected");
-                    }
-                });
-            }
-
-            if (actorTagList.classList.contains("receptor")) {
-                actorTagList.querySelectorAll(".tag").forEach((actorTag) => {
-                    if (actorTag.dataset.id == this.idActorSelected.receptor.id) {
-                        actorTag.classList.add("selected");
-                    }
-                });
-            }
-        });
-
-        /**
-         * Qualifiers tags update
-         */
-        const qualifiersFound = GlobalService.lokiDb.getQualifiers();
-        let qualifiersTag = "";
-        for (let i = 0; i < qualifiersFound.length; i++) {
-            const id = qualifiersFound[i].id;
-            const name = qualifiersFound[i].name;
-            const selected = this.idQualifierSelected == id ? 'selected' : '';
-            const actorTag = '<a href="#" class="tag btn btn-sm animated-button thar-one ' + selected + '" data-id="' + id + '" data-name="' + name + '" data-type="qualifier">' + name + '</a>';
-            qualifiersTag += actorTag;
-        }
-        document.querySelectorAll(".qualifiersTag").forEach((qualifierTag) => {
-            qualifierTag.innerHTML = qualifiersTag;
-        });
-
         /**
          * Relations update
          */
@@ -386,7 +228,7 @@ class DomHandler {
                 relationsList += relationItem;
             }
         );
-        document.querySelector("#relationsList").innerHTML = relationsList;
+        document.querySelector(".relationsList").innerHTML = relationsList;
 
         // Removes a relation
         document.querySelectorAll(".close").forEach((closeButton) => {
@@ -398,79 +240,13 @@ class DomHandler {
             });
         });
 
-
-        //     _______  _______  _______  _______ _________ _______  _______    _______    _        _______             _______  _______  _        _______ __________________ _______  _         
-        //    (  ____ \(  ____ )(  ____ \(  ___  )\__   __/(  ____ \(  ____ \  (  ___  )  ( (    /|(  ____ \|\     /|  (  ____ )(  ____ \( \      (  ___  )\__   __/\__   __/(  ___  )( (    /|  
-        //    | (    \/| (    )|| (    \/| (   ) |   ) (   | (    \/| (    \/  | (   ) |  |  \  ( || (    \/| )   ( |  | (    )|| (    \/| (      | (   ) |   ) (      ) (   | (   ) ||  \  ( |  
-        //    | |      | (____)|| (__    | (___) |   | |   | (__    | (_____   | (___) |  |   \ | || (__    | | _ | |  | (____)|| (__    | |      | (___) |   | |      | |   | |   | ||   \ | |  
-        //    | |      |     __)|  __)   |  ___  |   | |   |  __)   (_____  )  |  ___  |  | (\ \) ||  __)   | |( )| |  |     __)|  __)   | |      |  ___  |   | |      | |   | |   | || (\ \) |  
-        //    | |      | (\ (   | (      | (   ) |   | |   | (            ) |  | (   ) |  | | \   || (      | || || |  | (\ (   | (      | |      | (   ) |   | |      | |   | |   | || | \   |  
-        //    | (____/\| ) \ \__| (____/\| )   ( |   | |   | (____/\/\____) |  | )   ( |  | )  \  || (____/\| () () |  | ) \ \__| (____/\| (____/\| )   ( |   | |   ___) (___| (___) || )  \  |  
-        //    (_______/|/   \__/(_______/|/     \|   )_(   (_______/\_______)  |/     \|  |/    )_)(_______/(_______)  |/   \__/(_______/(_______/|/     \|   )_(   \_______/(_______)|/    )_)  
-
-        const tags = document.querySelectorAll(".tag");
-        tags.forEach((tag) => {
-            tag.addEventListener('click', (event) => {
-                event.preventDefault();
-                const element = event.currentTarget;
-
-                if (element.parentNode.classList.contains("emettor")) {
-                    if (event.ctrlKey) {
-                        GlobalService.lokiDb.nodes.findAndRemove({ id: element.dataset.id });
-                    } else {
-                        document.querySelector("#emettor").dataset.id = element.dataset.id;
-                        document.querySelector("#emettor").dataset.name = element.dataset.name;
-                        this.idActorSelected.emettor.id = element.dataset.id;
-                    }
-                }
-
-                if (element.parentNode.classList.contains("qualifier")) {
-                    if (event.ctrlKey) {
-                        qualifiers.findAndRemove({ id: element.dataset.id });
-                    } else {
-                        document.querySelector("#qualifier").dataset.id = element.dataset.id;
-                        document.querySelector("#qualifier").dataset.name = element.dataset.name;
-                        this.idQualifierSelected = element.dataset.id;
-                    }
-                }
-
-                if (element.parentNode.classList.contains("receptor")) {
-                    if (event.ctrlKey) {
-                        GlobalService.lokiDb.nodes.findAndRemove({ id: element.dataset.id });
-                    } else {
-                        document.querySelector("#receptor").dataset.id = element.dataset.id;
-                        document.querySelector("#receptor").dataset.name = element.dataset.name;
-
-                        this.idActorSelected.receptor.id = element.dataset.id;
-
-                        this.idActorSelected = {
-                            "emettor": {
-                                "id": null
-                            },
-                            "receptor": {
-                                "id": null
-                            }
-                        };
-
-                        this.idQualifierSelected = null;
-
-                        const emettorElement = document.querySelector("#emettor");
-                        const receptorElement = document.querySelector("#receptor");
-                        const qualifierElement = document.querySelector("#qualifier");
-                        try {
-                            GlobalService.lokiDb.addRelation(emettorElement.dataset.id, qualifierElement.dataset.id, receptorElement.dataset.id);
-                        } catch (error) {
-                            ipcRenderer.invoke('alert:message', { message: error, icon: "error" });
-                        }
-
-                        this.renderGraph();
-                        GlobalService.Utils.emptyRelationChunks();
-                    }
-                }
-                this.updateDomEvent();
-            });
-        });
-
+        /**
+         * Event updating base dom elements, like graph
+         */
+        document.addEventListener("updateEvent", (event) => {
+            this.updateDomEvent();
+            this.renderGraph();
+        }, { once: true });
 
         //     _______           _______  _______  _                  _________ _______ _________ ______  _________ _       __________________            _______  _______    ______           __________________ _______  _        _______ 
         //    (  ____ \|\     /|(  ____ \(  ____ \| \    /\  |\     /|\__   __/(  ____ \\__   __/(  ___ \ \__   __/( \      \__   __/\__   __/|\     /|  (  ___  )(  ____ \  (  ___ \ |\     /|\__   __/\__   __/(  ___  )( (    /|(  ____ \
@@ -486,9 +262,9 @@ class DomHandler {
         const qualifierVisibility = GlobalService.lokiDb.getQualifiers().length > 0;
         document.getElementById("save-image").classList.toggle("visible", relationsVisibility);
         document.getElementById("graph").classList.toggle("visible", relationsVisibility);
-        document.getElementById("save-configuration").classList.toggle("visible", actorsVisibility);
+        // document.getElementById("save-configuration").classList.toggle("visible", actorsVisibility);
         document.querySelectorAll(".actorTitle").forEach((title) => title.classList.toggle("visible", actorsVisibility));
-        document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));        
+        document.querySelectorAll(".qualifierTitle").forEach((title) => title.classList.toggle("visible", qualifierVisibility));
     }
 }
 

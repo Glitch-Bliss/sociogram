@@ -1,57 +1,127 @@
+@import "_colors.scss";
+
 #relations {
 
     position: relative;
     z-index: 2;
-    background: #363636;
     padding: 30px;
+}
 
-    .actorsTag,
-    .qualifiersTag {
-        width: 100%;
-        text-align: center;
+
+.relationsList {
+
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    align-content: stretch;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: stretch;
+    height: 54px;
+    overflow: hidden;
+    z-index: 3;
+
+    &:hover {
+        height: auto;
     }
 
-    .tagsRow {
-        margin-bottom: 20px;
-    }
+    .alert {
+        margin-bottom: 5px;
 
-    .tag,
-    .buttonTag {
-        font-family: 'Open Sans', sans-serif;
-        color: white;
-        height: 40px;
-        line-height: 36px;
-        padding: 0 5px;
-        margin: 2px;
-        text-align: center;
-        cursor: pointer;
-
-        i {
-            padding-left: 2px;
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 25px;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            text-align: center;
         }
     }
 
-    #relationsList {
-        .alert {
-            margin-bottom: 5px;
+    .alert-success {
+        background-color: #bdd5ea;
+        border-color: #9e6ab5;
+        border-radius: 0;
+    }
+}
 
-            .close {
-                float: right;
-                cursor: pointer;
-                font-size: 25px;
-                display: inline-block;
-                width: 25px;
-                height: 25px;
-                line-height: 25px;
-                text-align: center;
-            }
-        }
 
-        .alert-success {
-            background-color: #bdd5ea;
-            border-color: #9e6ab5;
-            border-radius: 0;
-        }
+
+// TAGS
+
+.actorsTag {
+    .tag {
+        background: $actorsColor;
+    }
+}
+
+.qualifiersTag {
+    .tag {
+        background: $qualifierColor;
+    }
+}
+
+.actorsTag,
+.qualifiersTag,
+tag-list {
+
+    &:hover {
+        height: auto;
+        max-height: 1800px;
     }
 
+    transition: all 0.2s ease-out;
+    position: relative;
+    width: 33%;
+    z-index: 3;
+    height: 49px;
+    max-height: 49px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
+    align-items: stretch;
+    overflow: hidden;
+
+    .tag {
+        margin: 3px;
+        width: 32%;
+    }
+}
+
+.tagsRow {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: stretch;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.tag,
+.buttonTag {
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+    height: 40px;
+    line-height: 36px;
+    padding: 0 5px;
+    margin: 2px;
+    text-align: center;
+    cursor: pointer;
+
+    i {
+        padding-left: 2px;
+    }
+}
+
+.selected {
+    background: red;
+
+    &::before {
+        top: 100%;
+    }
 }

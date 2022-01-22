@@ -82,6 +82,7 @@ class LokiDb {
 
         if (this.nodes.find({ name: node.name }).length == 0) {
             const insertedNode = this.nodes.insert(node);
+            return insertedNode;
         }
     }
 
@@ -90,7 +91,7 @@ class LokiDb {
      */
     addActor(payload) {
         if (payload.name) {
-            this.addNode(payload, "actor");
+            return this.addNode(payload, "actor");
         }
     }
 
